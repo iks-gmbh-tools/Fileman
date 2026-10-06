@@ -48,13 +48,13 @@ export enum Icon {List = 'list',
                     FavouriteFilterInactive = 'star_border'}
 
 export const FilemanTooltipOptions: TooltipOptions = {
-  'placement': 'right',
-  'theme': 'light',
-  'width': 300,
+  placement: 'right',
+  theme: 'light',
+  width: 300,
   'max-width': 600,
   'show-delay': 500,
   'tooltip-class': 'global-tooltip-style'
-}
+};
 
 export const MultiselectDropdownSettings = {
   singleSelection: false,
@@ -73,7 +73,7 @@ export const MultiselectDropdownSettings = {
   closeDropDownOnSelection: false,
   showSelectedItemsAtTop: false,
   defaultOpen: false
-}
+};
 
 export class FilemanConstants
 {

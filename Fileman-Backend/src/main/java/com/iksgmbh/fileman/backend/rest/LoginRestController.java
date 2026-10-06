@@ -85,26 +85,31 @@ public class LoginRestController {
 			user.setPassword("");
 		}
 		
-		if (!(loginRequest.getUserPw().length() == 0 && user.getPassword().length() == 0) &&  
+		if (!(loginRequest.getUserPw().isEmpty() && user.getPassword().isEmpty()) &&
 			  !passwordEncoder.matches(loginRequest.getUserPw(), user.getPassword())) {
 			loginResponse.setErrorMessage(AUTH_FAIL_MESSAGE);
 			loginResponse.setOk(false);
 			return ResponseEntity.ok(loginResponse);		
 		}
-		
-		Optional<Tenant> tenantOptional = user.getTenants()
-				.stream()
-				.filter(tenant -> 
-					tenant.getName().equals(loginRequest.getTenant())
-				).findAny();
-		
-		if (!tenantOptional.isPresent()) {
-			loginResponse.setErrorMessage(AUTH_FAIL_MESSAGE);
-			loginResponse.setOk(false);
-			return ResponseEntity.ok(loginResponse);
+
+		Tenant tenant;
+
+		if (loginRequest.getTenant() == null || loginRequest.getTenant().isEmpty()) {
+			tenant = user.getTenants().get(0);
+		} else {
+			Optional<Tenant> tenantOptional = user.getTenants()
+					.stream()
+					.filter(t ->
+							t.getName().equals(loginRequest.getTenant())
+					).findAny();
+
+			if (!tenantOptional.isPresent()) {
+				loginResponse.setErrorMessage(AUTH_FAIL_MESSAGE);
+				loginResponse.setOk(false);
+				return ResponseEntity.ok(loginResponse);
+			}
+			tenant = tenantOptional.get();
 		}
-		
-		Tenant tenant = tenantOptional.get();
 
 		final String token = JwtTokenUtil.generateToken(user, tenant.getId());
 
