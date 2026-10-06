@@ -1,27 +1,80 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles for the Fileman redesign.
+   1. Bootstrap stays for its reset and grid helpers; its look is overridden below.
+   2. tokens.css holds every colour, size and font as a CSS variable (from the design system).
+   3. fileman.css holds the shared component classes (prefix fm-), identical to the design system's bundle.css. */
 
 @import "~bootstrap/dist/css/bootstrap.css";
+@import "styles/tokens.css";
+@import "styles/fileman.css";
 
-body { padding: 20px; }
+html, body { height: 100%; }
 
-.form-Control.ng-touched.ng-invalid {
-    border: 2px solid red;
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
 }
 
-.right {
-  /* margin-left:auto;
-  margin-right:0; */
-  float: right !important;
-}
+a { color: var(--primary); }
+a:hover { color: var(--primary-strong); }
 
-.left {
-  float: left !important;
-}
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-sans); color: var(--ink); }
 
-.bottom {
-  vertical-align: bottom;
-}
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
+.right { float: right !important; }
+.left { float: left !important; }
+.bottom { vertical-align: bottom; }
+
+/* Tooltips (ng2-tooltip-directive) */
 .global-tooltip-style {
-  background-color: lavender !important;
+  background-color: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-menu) !important;
+  font-size: 13px !important;
+  text-align: left !important;
 }
+.inner-html-enclosing-div { text-align: left; }
+.inner-html-left-span { float: left; width: 45%; color: var(--ink-muted); }
+
+/* ng-multiselect-dropdown, restyled as the TokenSelect of the design system */
+.multiselect-dropdown .dropdown-btn {
+  min-height: var(--input-height);
+  padding: 4px 32px 4px 8px !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--surface) !important;
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+.multiselect-dropdown .dropdown-btn .selected-item {
+  display: inline-flex !important;
+  align-items: center;
+  height: 26px;
+  margin: 2px 4px 2px 0 !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  border-radius: 13px !important;
+  background: var(--primary-soft) !important;
+  color: var(--primary) !important;
+  font-weight: 600;
+}
+.multiselect-dropdown .dropdown-btn .selected-item a { color: var(--primary) !important; margin-left: 4px; }
+.multiselect-dropdown .dropdown-list {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-menu) !important;
+}
+.multiselect-item-checkbox input[type=checkbox] + div:before { border-color: var(--primary) !important; color: var(--primary) !important; }
+.multiselect-item-checkbox input[type=checkbox]:checked + div:before { background: var(--primary) !important; }
+.multiselect-dropdown .dropdown-btn .dropdown-down { border-top-color: var(--ink-muted) !important; }
+.multiselect-dropdown .dropdown-btn .dropdown-up { border-bottom-color: var(--ink-muted) !important; }
+
+/* Bootstrap leftovers used by third-party widgets */
+.btn:focus, .btn.focus { box-shadow: none; }

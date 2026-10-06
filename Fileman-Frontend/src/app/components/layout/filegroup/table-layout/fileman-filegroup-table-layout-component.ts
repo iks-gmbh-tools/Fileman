@@ -17,7 +17,7 @@ import { Component } from '@angular/core';
 import { MatSelect } from '@angular/material/select';
 
 import { SortType } from 'src/app/common/fileman-constants';
-import { LayoutFileGroupCommons } from '../layout-fileGroup-commons';
+import { LayoutFileGroupCommons } from '../layout-filegroup-commons';
 
 @Component({
   selector: 'fileman-filegroup-table-layout',

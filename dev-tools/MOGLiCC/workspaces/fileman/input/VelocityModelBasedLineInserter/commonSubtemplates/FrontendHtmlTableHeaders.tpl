@@ -10,10 +10,10 @@
 	#set( $AttributeName = $TemplateStringUtility.firstToUpperCase($attributeName) )
 
     #if ( ! $attributeDescriptor.doesHaveMetaInfo("hideFromClientOverview", "true"))
-	'        <td>
+	'        <th>
 	'            $AttributeName
 	'            <fileman-sorticon [sortField]="$quote$attributeName$quote" (sortEventHandler)="sort($event)"></fileman-sorticon>
-	'        </td>
+	'        </th>
 	#end
 	
 #end

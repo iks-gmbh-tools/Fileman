@@ -1,0 +1,7 @@
+/* Log-in page (design system: LoginScreen). Shared styles: src/styles/fileman.css */
+:host { display: block; }
+.fm-login { min-height: 100vh; }
+.fm-login__brandline { display: flex; align-items: baseline; gap: 10px; }
+.fm-login__head { display: flex; flex-direction: column; gap: 4px; }
+.fm-login__footer { font-size: 13px; color: var(--ink-muted); }
+.fm-alert fileman-icon { margin-top: 1px; }

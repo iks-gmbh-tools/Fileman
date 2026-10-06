@@ -1,17 +1,28 @@
-<li *ngFor="let tenant of viewedTenants; let i = index"
-    class="list-group-item">
-
-    <span *ngIf="! readOnly">
-        &nbsp;
-        <mat-icon data-toggle="tooltip" title="Edit" (click)="edit(tenant)">edit</mat-icon>
+<ul class="fm-list" aria-label="Tenants">
+  <li class="fm-row" *ngFor="let tenant of viewedTenants; let i = index">
+    <span class="fm-row__lead" aria-hidden="true"><fileman-icon name="building"></fileman-icon></span>
+    <span class="fm-row__text" tooltip="{{getDetailsTooltip(tenant)}}">
+      <span class="fm-row__name">{{tenant.name}}</span>
     </span>
-
-    <span *ngIf="! readOnly">
-        &nbsp;
-        <mat-icon *ngIf="! readOnly" data-toggle="tooltip" title="Delete" (click)="delete(tenant)">delete</mat-icon>
-    </span>
-
-    <span tooltip="{{getDetailsTooltip(tenant)}}">
-        {{i+1}}. {{tenant.name}}
-    </span>
-</li>
+    <span *ngIf="!readOnly" class="fm-row__actions">
+        <button type="button" class="fm-icon-btn" data-option="edit" aria-label="Edit tenant" title="Edit tenant" (click)="edit(tenant)">
+          <fileman-icon name="edit"></fileman-icon>
+        </button>
+        <span class="fm-menu-anchor" filemanOutsideClickListener (clickedOutside)="closeMenu(i)" (keydown.escape)="closeMenu(i)">
+          <button type="button" class="fm-icon-btn" aria-haspopup="menu" [attr.aria-expanded]="isMenuOpen(i)"
+                  aria-label="More actions" title="More actions" (click)="toggleMenu(i, $event)">
+            <fileman-icon name="more"></fileman-icon>
+          </button>
+          <div class="fm-menu fm-menu--floating" role="menu" [hidden]="!isMenuOpen(i)" [ngStyle]="menuStyle">
+            <button type="button" class="fm-menu__item" role="menuitem" data-option="edit-menu" (click)="closeMenu(); edit(tenant)">
+              <fileman-icon name="edit" [size]="18"></fileman-icon>Edit
+            </button>
+            <span class="fm-menu__sep" role="separator"></span>
+            <button type="button" class="fm-menu__item fm-menu__item--danger" role="menuitem" data-option="delete" (click)="closeMenu(); delete(tenant)">
+              <fileman-icon name="trash" [size]="18"></fileman-icon>Delete…
+            </button>
+          </div>
+        </span>
+      </span>
+  </li>
+</ul>

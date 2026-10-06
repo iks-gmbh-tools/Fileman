@@ -1,0 +1,6 @@
+/* Error page (design system: ErrorPage). Shared styles: src/styles/fileman.css */
+:host { display: block; }
+.fm-error-page__code { font-size: 13px; font-weight: 600; color: var(--ink-muted); }
+.fm-error-page__inner p { margin: 0; }
+.fm-error-page__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.fm-error-page__actions a { text-decoration: none; }

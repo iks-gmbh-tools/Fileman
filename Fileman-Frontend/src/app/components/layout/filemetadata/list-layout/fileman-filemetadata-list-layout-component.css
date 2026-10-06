@@ -1,14 +1,4 @@
-.mat-icon {
-  color: blue;
-  background: lightgoldenrodyellow;
-  cursor: pointer;
-}
-
-::ng-deep .inner-html-enclosing-div {
-  text-align: left;
-}
-
-::ng-deep .inner-html-left-span {
-  float: left;
-  width: 50%;
-}
+/* List layout (design system: FileListItem). Shared styles: src/styles/fileman.css */
+:host { display: block; }
+.fm-row__name { font-weight: 600; overflow-wrap: anywhere; }
+.fm-row__actions { display: inline-flex; align-items: center; margin-left: auto; }

@@ -1,37 +1,39 @@
-<h3>Content History of file <b><i>{{selectedFile}}</i></b></h3>
-<br>
-<table>
-	<tr style="font-weight:bold; background-color:darkgray;">
-		<td>Active</td>
-		<td>Order</td>
-		<td>UUID</td>
-		<td>Size</td>
-		<td>Creator</td>
-		<td>Creation Date</td>
-	</tr>
-	<tr *ngFor="let contentVersion of contentVersions; let i = index">
-		<td align="center">
-		<input type="radio" name="avtive"
-			   checked="{{isActive(contentVersion.name, contentVersion.uuid)}}"
-			   (click)="setSelected(contentVersion.uuid)"
-		/>
-		</td>
-		<td align="center">{{contentVersions.length - i}}.</td>
-		<td>{{contentVersion.uuid}}</td>
-		<td align="right">{{contentVersion.size}}</td>
-		<td>{{contentVersion.creator}}</td>
-    <td>&#8203;{{formatCreationDate(contentVersion.creationDate)}}</td>
-	</tr>
-</table>
+<div class="fm-page">
+  <fileman-toolbar [showPageToolbar]="false"></fileman-toolbar>
 
-<br>
+  <main class="fm-form-page">
+    <nav class="fm-crumbs" aria-label="Breadcrumb">
+      <a href="" (click)="$event.preventDefault(); cancel()">Files</a>
+      <span aria-hidden="true">›</span>
+      {{selectedFile}}
+    </nav>
+    <div class="fm-heading">
+      <h1 class="fm-title">History of {{selectedFile}}</h1>
+      <span class="fm-muted">The active version is what systems get when they fetch this file.</span>
+    </div>
 
-<button *ngIf="!readOnly"
-        [disabled]="!viewTouched"
-		class="btn btn-primary"
-		(click)="save()"
->Save</button>
-&nbsp;
-<button class="btn btn-primary"
-		(click)="cancel()"
->Cancel</button>
+    <form class="fm-form-card" (ngSubmit)="save()">
+      <div class="fm-form-card__body">
+        <fieldset class="fm-history">
+          <legend class="fm-history__label">Versions</legend>
+          <label class="fm-version" *ngFor="let contentVersion of contentVersions; let i = index">
+            <input type="radio" name="activeVersion"
+                   [checked]="isActive(contentVersion.name, contentVersion.uuid)"
+                   [disabled]="readOnly"
+                   (click)="setSelected(contentVersion.uuid)">
+            <span>
+              <b class="fm-strong">Version {{contentVersions.length - i}}</b> · {{contentVersion.creator}} · {{formatCreationDate(contentVersion.creationDate)}}
+              <span class="fm-mono fm-muted">{{contentVersion.uuid}}</span>
+            </span>
+            <span class="fm-version__size">{{contentVersion.size}} B</span>
+          </label>
+          <p class="fm-muted" *ngIf="contentVersions.length == 0">Loading versions…</p>
+        </fieldset>
+      </div>
+      <div class="fm-form-card__actions">
+        <button type="button" class="fm-btn" (click)="cancel()">{{readOnly ? 'Back' : 'Cancel'}}</button>
+        <button *ngIf="!readOnly" type="submit" class="fm-btn fm-btn--primary" [disabled]="!viewTouched">Make selected version active</button>
+      </div>
+    </form>
+  </main>
+</div>

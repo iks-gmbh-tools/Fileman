@@ -1,15 +1,9 @@
-<fileman-toolbar>
-    <span class="username right">{{currentUserName}} &nbsp;</span>
-</fileman-toolbar>
-<fileman-file-overview
-  *ngIf="contentType === contentTypeFiles">
-</fileman-file-overview>
-<fileman-user-overview
-  *ngIf="contentType === contentTypeUsers">
-</fileman-user-overview>
-<fileman-tenant-overview
-  *ngIf="contentType === contentTypeTenants">
-</fileman-tenant-overview>
-<fileman-filegroup-overview
-  *ngIf="contentType === contentTypeFileGroups">
-</fileman-filegroup-overview>
+<div class="fm-page">
+  <fileman-toolbar></fileman-toolbar>
+  <main class="fm-main fm-main--content">
+    <fileman-file-overview *ngIf="contentType === contentTypeFiles"></fileman-file-overview>
+    <fileman-user-overview *ngIf="contentType === contentTypeUsers"></fileman-user-overview>
+    <fileman-tenant-overview *ngIf="contentType === contentTypeTenants"></fileman-tenant-overview>
+    <fileman-filegroup-overview *ngIf="contentType === contentTypeFileGroups"></fileman-filegroup-overview>
+  </main>
+</div>

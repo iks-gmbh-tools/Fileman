@@ -16,7 +16,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import * as FileSaver from 'file-saver';
 
 import { FilemanFileOverviewComponent } from './fileman-file-overview.component';
@@ -25,6 +25,8 @@ import { FilemanFileService } from 'src/app/services/fileman-file-service.servic
 import { FileMetaData } from 'src/app/common/domainobjects/gen/FileMetaData';
 import { FilemanFavouriteSettingsService } from 'src/app/services/fileman-favourite-settings-service.service';
 import { FilemanPreviewService } from 'src/app/services/fileman-preview-service.service';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FileGroupService } from 'src/app/services/fileman-filegroup-service.service';
 
 describe('FilemanFileOverviewComponent', () => {
   let component: FilemanFileOverviewComponent;
@@ -42,7 +44,12 @@ describe('FilemanFileOverviewComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ FilemanFileOverviewComponent ],
       imports: [ RouterTestingModule, HttpClientModule ],
-      providers: [{provide: FilemanPreviewService, useValue: previewService}]
+      providers: [{provide: FilemanPreviewService, useValue: previewService},
+                  // no backend in unit tests: no file groups, no change notifications
+                  {provide: FileGroupService, useValue: {
+                    getAllFileGroups: () => of([]),
+                    getFileGroupDataChangedNotifier: () => new Subject()
+                  }}]
     });
 
     fixture = TestBed.createComponent(FilemanFileOverviewComponent);
@@ -63,7 +70,7 @@ describe('FilemanFileOverviewComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should delete file', () => {
+  it('should delete file after confirmation', async () => {
     const toBeDeleted: FileMetaData = new FileMetaData({name: 'to_be_deleted.txt'});
     const toPersist: FileMetaData = new FileMetaData({name: 'to_persist.txt'});
 
@@ -82,7 +89,9 @@ describe('FilemanFileOverviewComponent', () => {
     expect(component.viewedFiles[0].getName()).toEqual('to_be_deleted.txt');
     expect(component.viewedFiles[1].getName()).toEqual('to_persist.txt');
 
-    spyOn(window, 'confirm').and.returnValue(true);
+    const dialogService: FilemanDialogService = fixture.debugElement.injector.get(FilemanDialogService);
+    const confirmed = Promise.resolve(true);
+    spyOn(dialogService, 'confirm').and.returnValue(confirmed);
 
     const deleteSpy = spyOn(fileService, 'delete').and.returnValue(
       new Observable(() => {
@@ -92,8 +101,22 @@ describe('FilemanFileOverviewComponent', () => {
     }));
 
     component.delete(toBeDeleted);
+    await confirmed;  // the component's then() runs before this await returns
 
+    expect(dialogService.confirm).toHaveBeenCalled();
     expect(deleteSpy).toHaveBeenCalled();
+  });
+
+  it('should not delete file when the confirmation is cancelled', async () => {
+    const dialogService: FilemanDialogService = fixture.debugElement.injector.get(FilemanDialogService);
+    const cancelled = Promise.resolve(false);
+    spyOn(dialogService, 'confirm').and.returnValue(cancelled);
+    const deleteSpy = spyOn(fileService, 'delete');
+
+    component.delete(new FileMetaData({name: 'keep_me.txt'}));
+    await cancelled;
+
+    expect(deleteSpy).not.toHaveBeenCalled();
   });
 
   it('should search for file', () => {

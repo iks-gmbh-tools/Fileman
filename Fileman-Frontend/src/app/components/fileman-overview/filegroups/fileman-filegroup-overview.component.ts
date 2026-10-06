@@ -28,6 +28,8 @@ import { FilemanUserPreferencesService } from 'src/app/services/fileman-user-pre
 import { UserPreferences } from 'src/app/common/domainobjects/gen/UserPreferences';
 import { FilemanSearchService } from 'src/app/services/fileman-search-service.service';
 import { FilemanReloadService } from 'src/app/services/fileman-reload-service.service';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 import { FilemanMetadataService } from 'src/app/services/fileman-metadata-service.service';
 
 @Component({
@@ -58,12 +60,11 @@ export class FilemanFileGroupOverviewComponent implements OnInit, OnDestroy {
               private userPreferencesService: FilemanUserPreferencesService,
               private searchService: FilemanSearchService,
               private reloadService: FilemanReloadService,
-              private metadataService: FilemanMetadataService) {
-                  console.log('########### overview constr');
-              }
+              private metadataService: FilemanMetadataService,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) {}
 
   ngOnInit(): void {
-    console.log('### file group overview init')
     this.currentUserName = this.authService.getCurrentUserName();
     this.userPreferences = this.userPreferencesService.getUserPreferences();
     this.userPreferencesSubscription =
@@ -131,8 +132,19 @@ export class FilemanFileGroupOverviewComponent implements OnInit, OnDestroy {
   }
 
   delete(fileGroup: FileGroup) {
-    const ok = confirm('Are you sure to delete "' + fileGroup.getName() + '"?');
-    if (! ok) {return;}
+    this.dialogService.confirm({
+      title: 'Delete ' + fileGroup.getName() + '?',
+      message: 'The file group is removed for everyone. Its files stay. This can\'t be undone.',
+      confirmLabel: 'Delete file group',
+      danger: true
+    }).then(ok => {
+      if (ok) {
+        this.deleteConfirmed(fileGroup);
+      }
+    });
+  }
+
+  private deleteConfirmed(fileGroup: FileGroup) {
     const toDelete = this.allFileGroupsMap.get(fileGroup.getName());
     this.allFileGroupsMap.delete(fileGroup.getName());
     const index = this.viewedFileGroups.indexOf(toDelete);
@@ -142,7 +154,7 @@ export class FilemanFileGroupOverviewComponent implements OnInit, OnDestroy {
         .delete(fileGroup)
         .subscribe(
           deletedFileGroup => {
-              console.log('Successfully deleted file group: ' + fileGroup.getName());
+              this.toastService.success('Deleted ' + fileGroup.getName() + '.');
               this.metadataService.markDataAsOutdated();
             },
           (error: FilemanError) => {
@@ -151,12 +163,16 @@ export class FilemanFileGroupOverviewComponent implements OnInit, OnDestroy {
 
             if (error instanceof FilemanNotfoundError) {
               // TODO this.form.setErrors(error.cause);
-              alert('File group does not (more?) exist.')
+              this.dialogService.alert('File group not found', fileGroup.getName() + ' doesn\'t exist anymore. Reload to see the current file groups.')
             } else {
               throw error;
             }
           }
         );
+  }
+
+  clearSearch() {
+    this.searchService.setSearchString('');
   }
 
   ngOnDestroy() {

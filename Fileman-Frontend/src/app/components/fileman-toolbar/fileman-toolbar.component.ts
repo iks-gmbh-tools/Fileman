@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -31,6 +31,9 @@ import { FilemanReloadService } from 'src/app/services/fileman-reload-service.se
   styleUrls: ['./fileman-toolbar.component.css']
 })
 export class FilemanToolbarComponent implements OnInit {
+
+  /** false on create/edit pages: header only, without title row and search */
+  @Input() showPageToolbar = true;
   readonly contentTypeFiles: string = Content.Files;
   readonly contentTypeUsers: string = Content.Users;
   readonly contentTypeTenants: string = Content.Tenants;
@@ -51,6 +54,14 @@ export class FilemanToolbarComponent implements OnInit {
   userPreferences: UserPreferences;
   userPreferencesSubscription: Subscription;
   showFavouriteIcon: boolean = true;
+  currentUserName: string;
+
+  readonly contentTabs = [
+    {type: Content.Files, label: 'Files'},
+    {type: Content.Users, label: 'Users'},
+    {type: Content.Tenants, label: 'Tenants'},
+    {type: Content.FileGroups, label: 'File groups'}
+  ];
   favouriteFilterIcon = Icon.FavouriteFilterInactive;
 
   constructor(private authService: FilemanAuthserviceService,
@@ -63,7 +74,9 @@ export class FilemanToolbarComponent implements OnInit {
   ngOnInit(): void {
     this.readOnly = this.authService.getCurrentUserRole() === UserRole.Reader;
     this.isAdmin = this.authService.getCurrentUserRole() === UserRole.Admin;
+    this.currentUserName = this.authService.getCurrentUserName();
     this.userPreferences = this.userPreferencesService.getUserPreferences();
+    this.updateLayoutForUserPreferences(this.userPreferences);
     this.userPreferencesSubscription =
       this.userPreferencesService.getUserPreferencesChangeNotifier().subscribe(
         (userPreferences: UserPreferences) => {
@@ -93,6 +106,9 @@ export class FilemanToolbarComponent implements OnInit {
 
   onContentTypeChange(contentType: string) {
     this.userPreferencesService.setContentType(contentType);
+    if (!this.showPageToolbar) {
+      this.router.navigate(['/fileman/overview']);
+    }
   }
 
   onNewClick() {
@@ -147,6 +163,34 @@ export class FilemanToolbarComponent implements OnInit {
       }
       return 'Add new file';
     }
+  }
+
+  getTitle(): string {
+    const tab = this.contentTabs.find(t => t.type === this.userPreferences.contentType);
+    return tab ? tab.label : 'Files';
+  }
+
+  getContentLabel(): string {
+    return this.getTitle().toLowerCase();
+  }
+
+  getNewLabel(): string {
+    switch (this.userPreferences.contentType) {
+      case this.contentTypeUsers: return 'New user';
+      case this.contentTypeTenants: return 'New tenant';
+      case this.contentTypeFileGroups: return 'New file group';
+      default: return 'New file';
+    }
+  }
+
+  getUserInitials(): string {
+    if (!this.currentUserName) { return ''; }
+    return this.currentUserName.split(/[\s._-]+/)
+                               .filter(part => part.length > 0)
+                               .map(part => part[0])
+                               .join('')
+                               .substr(0, 2)
+                               .toUpperCase();
   }
 
   openDbLink() {

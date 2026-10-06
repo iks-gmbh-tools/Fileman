@@ -21,6 +21,8 @@ import { Observable } from 'rxjs';
 import { Tenant } from 'src/app/common/domainobjects/gen/Tenant';
 import { FilemanAuthserviceService } from 'src/app/services/fileman-authservice.service';
 import { TenantService } from 'src/app/services/fileman-tenant-service.service';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 
 @Component({
   selector: 'fileman-tenant-details',
@@ -38,7 +40,9 @@ export class TenantDetailsComponent implements OnInit {
 
   constructor(private router: Router,
               private authService: FilemanAuthserviceService,
-              private tenantService: TenantService) {
+              private tenantService: TenantService,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) {
       this.form = this.createFormGroup();
       this.currentlyLoggedInUser = authService.getCurrentUserName();
   }
@@ -52,7 +56,7 @@ export class TenantDetailsComponent implements OnInit {
       this.tenantService.getTenant(id).subscribe(tenant => {
         this.toEdit = new Tenant(tenant);
         if (this.toEdit == null) {
-          alert('No data available for tenant "' + id + '"!');
+          this.dialogService.alert('Tenant not available', 'No data is loaded for this tenant. Open it again from the overview.');
           this.backToOverview();  // no data to edit available - happens for page reload - reason unclear
         } else {
           this.setDataToControls(this.toEdit);
@@ -71,18 +75,20 @@ export class TenantDetailsComponent implements OnInit {
       id: this.toEdit != null ? this.toEdit.getId() : null,
       name: this.nameC.value.trim()
     });
-    console.log('Saving ');
-    console.log(toSave);
 
     if (this.newMode) {
       this.tenantService.create(toSave)
-          .subscribe(() => {}, error => {
-            alert('Error saving new tenant with name "' + toSave.getName() + '"!');
+          .subscribe(() => {
+            this.toastService.success('Created tenant ' + toSave.getName() + '.');
+          }, error => {
+            this.toastService.error('Creating tenant ' + toSave.getName() + ' failed. Try again.');
           });
     } else {
       this.tenantService.update(toSave)
-          .subscribe(() => {}, error => {
-            alert('Error updating tenant with ID "' + toSave.getId() + '"!');
+          .subscribe(() => {
+            this.toastService.success('Saved tenant ' + toSave.getName() + '.');
+          }, error => {
+            this.toastService.error('Saving tenant ' + toSave.getName() + ' failed. Try again.');
           });
     }
 

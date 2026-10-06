@@ -21,7 +21,10 @@ import { Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { FormsModule } from '@angular/forms';
 import { FilemanToolbarComponent } from './fileman-toolbar.component';
+import { FilemanIconComponent } from 'src/app/components/ui/fileman-icon.component';
+import { FilemanLogoComponent } from 'src/app/components/fileman-logo.component';
 import { Icon } from 'src/app/common/fileman-constants';
 import { FilemanUserPreferencesService } from 'src/app/services/fileman-user-preferences-service.service';
 import { UserPreferences } from 'src/app/common/domainobjects/gen/UserPreferences';
@@ -35,8 +38,8 @@ describe('FilemanToolbarComponent', () => {
     mockRouter = {navigate: jasmine.createSpy('navigate')};
 
     TestBed.configureTestingModule({
-      declarations: [ FilemanToolbarComponent ],
-      imports: [ RouterTestingModule, HttpClientModule ],
+      declarations: [ FilemanToolbarComponent, FilemanIconComponent, FilemanLogoComponent ],
+      imports: [ RouterTestingModule, HttpClientModule, FormsModule ],
       providers: [
         { provide: Router, useValue: mockRouter },
         { provide: FilemanUserPreferencesService, useClass: MockFilemanUserPreferencesService }
@@ -76,46 +79,44 @@ describe('FilemanToolbarComponent', () => {
     expect(mockRouter.navigate).not.toHaveBeenCalled();
   });
 
-  it('should have all icons as admin', () => {
+  it('should offer the database console only to admins', () => {
     component.isAdmin = true;
     fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css('#toolbar-database'))).toBeTruthy();
 
-    const debugElements: DebugElement[] = fixture.debugElement.queryAll(By.css('mat-icon'));
-    const iconStrings: Array<string> = [];
-
-    for (let debugElement of debugElements) {
-      iconStrings.push(debugElement.nativeElement.innerText);
-    }
-
-    expect(iconStrings.length).toEqual(8);
-    expect(iconStrings).toContain(Icon.List);
-    expect(iconStrings).toContain(Icon.Table);
-    expect(iconStrings).toContain(Icon.Tiles);
-    expect(iconStrings).toContain(Icon.New);
-    expect(iconStrings).toContain(Icon.Reload);
-    expect(iconStrings).toContain(Icon.FavouriteFilterInactive);
-    expect(iconStrings).toContain(Icon.Database);
-    expect(iconStrings).toContain(Icon.Logout);
-  });
-
-  it('should have all icons but database as non-admin', () => {
     component.isAdmin = false;
     fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css('#toolbar-database'))).toBeFalsy();
+  });
 
-    const debugElements: DebugElement[] = fixture.debugElement.queryAll(By.css('mat-icon'));
-    const iconStrings: Array<string> = [];
+  it('should show the content tabs only to admins', () => {
+    component.isAdmin = false;
+    fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css('.fm-tabs'))).toBeFalsy();
 
-    for (let debugElement of debugElements) {
-      iconStrings.push(debugElement.nativeElement.innerText);
-    }
+    component.isAdmin = true;
+    fixture.detectChanges();
+    expect(fixture.debugElement.queryAll(By.css('.fm-tab')).length).toEqual(4);
+  });
 
-    expect(iconStrings.length).toEqual(7);
-    expect(iconStrings).toContain(Icon.List);
-    expect(iconStrings).toContain(Icon.Table);
-    expect(iconStrings).toContain(Icon.Tiles);
-    expect(iconStrings).toContain(Icon.New);
-    expect(iconStrings).toContain(Icon.Reload);
-    expect(iconStrings).toContain(Icon.FavouriteFilterInactive);
-    expect(iconStrings).toContain(Icon.Logout);
+  it('should hide the New button from readers', () => {
+    component.readOnly = true;
+    fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css('#toolbar-new'))).toBeFalsy();
+
+    component.readOnly = false;
+    fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css('#toolbar-new'))).toBeTruthy();
+  });
+
+  it('should show the layout switch, reload and logout', () => {
+    fixture.detectChanges();
+    const icons: string[] = fixture.debugElement.queryAll(By.css('fileman-icon'))
+                                   .map((debugElement: DebugElement) => debugElement.nativeElement.getAttribute('data-icon'));
+    expect(icons).toContain(Icon.Reload);
+    expect(icons).toContain(Icon.Logout);
+    expect(fixture.debugElement.query(By.css('#toolbar-layout-list'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('#toolbar-layout-table'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('#toolbar-layout-tiles'))).toBeTruthy();
   });
 });

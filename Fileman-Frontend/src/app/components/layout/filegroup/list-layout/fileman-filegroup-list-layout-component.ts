@@ -15,7 +15,7 @@
  */
 import { Component } from '@angular/core';
 
-import { LayoutFileGroupCommons } from '../layout-fileGroup-commons';
+import { LayoutFileGroupCommons } from '../layout-filegroup-commons';
 import { FileGroup } from 'src/app/common/domainobjects/gen/FileGroup';
 
 @Component({

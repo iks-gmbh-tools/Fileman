@@ -35,6 +35,8 @@ import { FilemanSearchService } from 'src/app/services/fileman-search-service.se
 import { FilemanReloadService } from 'src/app/services/fileman-reload-service.service';
 import { FileGroup } from 'src/app/common/domainobjects/gen/FileGroup';
 import { FileGroupService } from 'src/app/services/fileman-filegroup-service.service';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 
 @Component({
   selector: 'fileman-file-overview',
@@ -75,12 +77,11 @@ export class FilemanFileOverviewComponent implements OnInit, OnDestroy {
               private previewService: FilemanPreviewService,
               private userPreferencesService: FilemanUserPreferencesService,
               private searchService: FilemanSearchService,
-              private reloadService: FilemanReloadService) {
-                  console.log('########### overview constr');
-              }
+              private reloadService: FilemanReloadService,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) {}
 
   ngOnInit(): void {
-    console.log('### file overview init')
     this.currentUserName = this.authService.getCurrentUserName();
     this.userPreferences = this.userPreferencesService.getUserPreferences();
     this.userPreferencesSubscription =
@@ -180,7 +181,7 @@ export class FilemanFileOverviewComponent implements OnInit, OnDestroy {
                     (error) => {
                       // remove optimistic update due to error
                       this.favouriteSettings.set(toDelete.getFilename(), toDelete);
-                      alert('Saving favourite setting failed!');
+                      this.toastService.error('Saving the favourite for ' + file.getName() + ' failed.');
                     }
           );
     }
@@ -196,7 +197,7 @@ export class FilemanFileOverviewComponent implements OnInit, OnDestroy {
             }, (error) => {
               // remove optimistic update due to error
               this.favouriteSettings.delete(file.getName());
-              alert('Saving favourite setting failed!');
+              this.toastService.error('Saving the favourite for ' + file.getName() + ' failed.');
             }
           );
     }
@@ -232,31 +233,62 @@ export class FilemanFileOverviewComponent implements OnInit, OnDestroy {
   }
 
   delete(file: FileMetaData) {
-    const ok = confirm('Are you sure to delete "' + file.getName() + '"?');
-    if (! ok) {return;}
+    this.dialogService.confirm({
+      title: 'Delete ' + file.getName() + '?',
+      message: 'The file and all its versions are removed for every user and every system that fetches it. This can\'t be undone.',
+      confirmLabel: 'Delete file',
+      danger: true
+    }).then(ok => {
+      if (ok) {
+        this.deleteConfirmed(file);
+      }
+    });
+  }
+
+  private deleteConfirmed(file: FileMetaData) {
     const toDelete = this.allFilesMap.get(file.getName());
     this.allFilesMap.delete(file.getName());
     const index = this.viewedFiles.indexOf(toDelete);
     this.viewedFiles.splice(index, 1);  // optimistic deletion
-
     this.fileService
         .delete(file.getName())
         .subscribe(
           deletedFile => {
-              console.log('Successfully deleted file: ' + file.getName());
+              this.toastService.success('Deleted ' + file.getName() + '.');
             },
           (error: FilemanError) => {
             this.viewedFiles.splice(index, 0, toDelete);  // roll back optimistic deletion
             this.allFilesMap.set(toDelete.getName(), toDelete);
-
             if (error instanceof FilemanNotfoundError) {
-              // TODO this.form.setErrors(error.cause);
-              alert('File does not (more?) exist.')
+              this.dialogService.alert('File not found', file.getName() + ' doesn\'t exist anymore. Reload to see the current files.');
             } else {
               throw error;
             }
           }
         );
+  }
+
+  createFile() {
+    this.router.navigate(['/fileman/files/new']);
+  }
+
+  clearSearch() {
+    this.searchService.setSearchString('');
+  }
+
+  clearFavouriteFilter() {
+    this.userPreferencesService.setFavouriteFilterActive(false);
+  }
+
+  getNoMatchTitle(): string {
+    if (this.searchString) {
+      return 'No files match \u201c' + this.searchString + '\u201d';
+    }
+    return 'No files match your filters';
+  }
+
+  isFileGroupSelected(fileGroup: FileGroup): boolean {
+    return this.isFileGroupInArray(fileGroup, this.selectedFileGroups);
   }
 
   updateFilePreviews() {

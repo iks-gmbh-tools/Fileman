@@ -7,6 +7,8 @@ import { FilemanPreviewService } from 'src/app/services/fileman-preview-service.
 import { FilemanAuthserviceService } from 'src/app/services/fileman-authservice.service';
 import { UserRole } from 'src/app/common/fileman-constants';
 import { Utils } from 'src/app/common/Utils';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 
 @Component({
   selector: 'file-history',
@@ -27,7 +29,9 @@ export class FilemanHistoryViewComponent implements OnInit {
               private previewService: FilemanPreviewService,
               private authService: FilemanAuthserviceService,
               private router: Router,
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) { }
 
   ngOnInit(): void {
     this.readOnly = this.authService.getCurrentUserRole() === UserRole.Reader;
@@ -55,17 +59,26 @@ export class FilemanHistoryViewComponent implements OnInit {
   }
 
   save() {
-    this.filesMetaDataService.setActive(this.selectedFile, this.selectedUUID).subscribe(() => {
-      this.previewService.preparePreview(this.selectedFile);
+    const index = this.contentVersions.findIndex(version => version.uuid === this.selectedUUID);
+    const versionLabel = index === -1 ? 'the selected version' : 'version ' + (this.contentVersions.length - index);
+    this.dialogService.confirm({
+      title: 'Make ' + versionLabel + ' active?',
+      message: 'Systems that fetch ' + this.selectedFile + ' will get ' + versionLabel + '. The other versions stay in the history.',
+      confirmLabel: 'Make active',
+      icon: 'layers'
+    }).then(ok => {
+      if (!ok) { return; }
+      this.filesMetaDataService.setActive(this.selectedFile, this.selectedUUID).subscribe(() => {
+        this.previewService.preparePreview(this.selectedFile);
+        this.toastService.success(this.selectedFile + ': ' + versionLabel + ' is active now.');
+      });
+      this.backToOverview();
     });
-
-    this.backToOverview();
   }
 
   setSelected(uuid: number) {
     if (this.selectedUUID !== uuid) {
       this.viewTouched = true;
-      console.log(this.viewTouched)
       this.selectedUUID = uuid;
     }
   }

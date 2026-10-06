@@ -1,13 +1,2 @@
-span {
-  font-size: 0;
-  line-height: 12px;
-  text-align: center;
-  padding-bottom: 4px;
-  display: inline-block;
-}
-
-.version-number {
-  text-align: right;
-  padding-right: 7px;
-  line-height: 0px;
-}
+/* Wordmark of the design system (type style "wordmark"); see .fm-brand in src/styles/fileman.css */
+:host { display: inline-flex; }

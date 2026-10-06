@@ -1,17 +1,28 @@
-<li *ngFor="let <<type>> of viewed<<Type>>s; let i = index"
-    class="list-group-item">
-
-    <span *ngIf="! readOnly">
-        &nbsp;
-        <mat-icon data-toggle="tooltip" title="Edit" (click)="edit(<<type>>)">edit</mat-icon>
+<ul class="fm-list" aria-label="<<Type>>s">
+  <li class="fm-row" *ngFor="let <<type>> of viewed<<Type>>s; let i = index">
+    <span class="fm-row__lead" aria-hidden="true"><fileman-icon name="file"></fileman-icon></span>
+    <span class="fm-row__text" tooltip="{{getDetailsTooltip(<<type>>)}}">
+      <span class="fm-row__name">{{<<type>>.name}}</span>
     </span>
-
-    <span *ngIf="! readOnly">
-        &nbsp;
-        <mat-icon *ngIf="! readOnly" data-toggle="tooltip" title="Delete" (click)="delete(<<type>>)">delete</mat-icon>
-    </span>
-
-    <span tooltip="{{getDetailsTooltip(<<type>>)}}">
-        {{i+1}}. {{<<type>>.name}}
-    </span>
-</li>
+    <span *ngIf="!readOnly" class="fm-row__actions">
+        <button type="button" class="fm-icon-btn" data-option="edit" aria-label="Edit <<type>>" title="Edit <<type>>" (click)="edit(<<type>>)">
+          <fileman-icon name="edit"></fileman-icon>
+        </button>
+        <span class="fm-menu-anchor" filemanOutsideClickListener (clickedOutside)="closeMenu(i)" (keydown.escape)="closeMenu(i)">
+          <button type="button" class="fm-icon-btn" aria-haspopup="menu" [attr.aria-expanded]="isMenuOpen(i)"
+                  aria-label="More actions" title="More actions" (click)="toggleMenu(i, $event)">
+            <fileman-icon name="more"></fileman-icon>
+          </button>
+          <div class="fm-menu fm-menu--floating" role="menu" [hidden]="!isMenuOpen(i)" [ngStyle]="menuStyle">
+            <button type="button" class="fm-menu__item" role="menuitem" data-option="edit-menu" (click)="closeMenu(); edit(<<type>>)">
+              <fileman-icon name="edit" [size]="18"></fileman-icon>Edit
+            </button>
+            <span class="fm-menu__sep" role="separator"></span>
+            <button type="button" class="fm-menu__item fm-menu__item--danger" role="menuitem" data-option="delete" (click)="closeMenu(); delete(<<type>>)">
+              <fileman-icon name="trash" [size]="18"></fileman-icon>Delete…
+            </button>
+          </div>
+        </span>
+      </span>
+  </li>
+</ul>

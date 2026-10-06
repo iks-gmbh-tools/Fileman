@@ -39,6 +39,19 @@ export class LayoutFileGroupCommons extends LayoutCommons {
       this.buildHtmlTooltipContentRow('Name', fileGroup.name)+'</div>'
   }
 
+  getFileList(fileGroup: FileGroup): FileMetaData[] {
+    const list: FileMetaData[] = [];
+    if (fileGroup && fileGroup.files) {
+      (fileGroup.files as any).forEach((file: FileMetaData) => list.push(file));
+    }
+    return list;
+  }
+
+  getFileCountLabel(fileGroup: FileGroup): string {
+    const count = this.getFileList(fileGroup).length;
+    return count === 1 ? '1 file' : count + ' files';
+  }
+
   formatFiles(files: Set<FileMetaData>): string {
     let fileString: string = '';
 

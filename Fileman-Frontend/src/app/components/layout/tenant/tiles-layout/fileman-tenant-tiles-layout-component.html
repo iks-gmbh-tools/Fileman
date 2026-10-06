@@ -1,35 +1,31 @@
-<div class="tiles-grid">
-  <div *ngFor="let tenant of viewedTenants; let i = index"
-       class="tiles-item">
-    <td width="40">
-      <span *ngIf="! readOnly">
-          <mat-icon  data-toggle="tooltip" title="Edit" (click)="edit(tenant)">edit</mat-icon>
-      </span>
-      <br>
-      <span *ngIf="! readOnly">
-          <mat-icon *ngIf="! readOnly" data-toggle="tooltip" title="Delete" (click)="delete(tenant)">delete</mat-icon>
-      </span>
-    </td>
-    <td>
-      <span tooltip="{{getDetailsTooltip(tenant)}}">
-          {{i+1}}. {{tenant.name}}
-          <div>
-            <img class="image-preview" *ngIf="hasImagePreview(tenant.name)" [src]="getImagePreview(tenant.name)">
-            <span class="text-preview" *ngIf="hasTextPreview(tenant.name)">{{ getTextPreview(tenant.name) }}</span>
-            <ngx-doc-viewer
-              class="docx-preview"
-              *ngIf="hasDocxPreview(tenant.name)"
-              [url]="getDocxPreview(tenant.name)"
-              viewer="mammoth">
-            </ngx-doc-viewer>
-            <pdf-viewer class="pdf-preview" *ngIf="hasPdfPreview(tenant.name)"
-              [src]="getPdfPreview(tenant.name)"
-              [render-text]="true"
-              [show-all]="false"
-              [original-size]="false">
-            </pdf-viewer>
+<div class="fm-tiles">
+  <article class="fm-tile" *ngFor="let tenant of viewedTenants; let i = index">
+    <div class="fm-tile__hero"><fileman-icon name="building" [size]="40"></fileman-icon></div>
+    <div class="fm-tile__body" tooltip="{{getDetailsTooltip(tenant)}}">
+      <span class="fm-tile__name" [title]="tenant.name">{{tenant.name}}</span>
+    </div>
+    <div class="fm-tile__actions">
+      <span class="fm-spacer"></span>
+      <span *ngIf="!readOnly" class="fm-row__actions">
+        <button type="button" class="fm-icon-btn" data-option="edit" aria-label="Edit tenant" title="Edit tenant" (click)="edit(tenant)">
+          <fileman-icon name="edit"></fileman-icon>
+        </button>
+        <span class="fm-menu-anchor" filemanOutsideClickListener (clickedOutside)="closeMenu(i)" (keydown.escape)="closeMenu(i)">
+          <button type="button" class="fm-icon-btn" aria-haspopup="menu" [attr.aria-expanded]="isMenuOpen(i)"
+                  aria-label="More actions" title="More actions" (click)="toggleMenu(i, $event)">
+            <fileman-icon name="more"></fileman-icon>
+          </button>
+          <div class="fm-menu fm-menu--floating" role="menu" [hidden]="!isMenuOpen(i)" [ngStyle]="menuStyle">
+            <button type="button" class="fm-menu__item" role="menuitem" data-option="edit-menu" (click)="closeMenu(); edit(tenant)">
+              <fileman-icon name="edit" [size]="18"></fileman-icon>Edit
+            </button>
+            <span class="fm-menu__sep" role="separator"></span>
+            <button type="button" class="fm-menu__item fm-menu__item--danger" role="menuitem" data-option="delete" (click)="closeMenu(); delete(tenant)">
+              <fileman-icon name="trash" [size]="18"></fileman-icon>Delete…
+            </button>
           </div>
+        </span>
       </span>
-    </td>
-  </div>
+    </div>
+  </article>
 </div>

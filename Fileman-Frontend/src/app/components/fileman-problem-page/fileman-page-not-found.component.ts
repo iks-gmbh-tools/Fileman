@@ -15,6 +15,7 @@
  */
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-fileman-page-not-found',
@@ -23,21 +24,37 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class FilemanProblemPageComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute) { }
-
-  private message0 = 'Unexpected Error!';
-  private message1 = 'The requested page is not known!';
-  private message2 = 'The requested page is not permitted for the current user!';
+  constructor(private route: ActivatedRoute, private location: Location) { }
 
   ngOnInit(): void {
   }
 
-  getMessage() {
-    const type = this.route.snapshot.queryParamMap.get('type');
-    if (!type) { return this.message1; }
-    if (type === '2') { return this.message2; }
-
-    return this.message0;
+  private getType(): string {
+    return this.route.snapshot.queryParamMap.get('type');
   }
 
+  getCode(): string {
+    const type = this.getType();
+    if (!type) { return 'Error 404'; }
+    if (type === '2') { return 'Error 403'; }
+    return 'Error';
+  }
+
+  getTitle(): string {
+    const type = this.getType();
+    if (!type) { return 'This page doesn\'t exist'; }
+    if (type === '2') { return 'You don\'t have access to this page'; }
+    return 'Something went wrong';
+  }
+
+  getMessage(): string {
+    const type = this.getType();
+    if (!type) { return 'Nothing is stored at this address. The item may have been renamed or deleted, or the link has a typo.'; }
+    if (type === '2') { return 'Your role doesn\'t allow this page. Ask an admin if you need access.'; }
+    return 'An unexpected error occurred. Go back to the files and try again.';
+  }
+
+  goBack() {
+    this.location.back();
+  }
 }

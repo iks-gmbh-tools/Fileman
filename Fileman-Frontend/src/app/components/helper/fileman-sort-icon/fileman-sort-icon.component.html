@@ -1,4 +1,8 @@
-<span>
-  <mat-icon data-toggle="tooltip" title="Sort ascending" (click)="sort(true)">keyboard_arrow_up</mat-icon>
-  <mat-icon data-toggle="tooltip" title="Sort descending" (click)="sort(false)">keyboard_arrow_down</mat-icon>
+<span class="fm-sort" role="group" [attr.aria-label]="'Sort by ' + sortField">
+  <button type="button" class="fm-sort__btn" aria-label="Sort ascending" title="Sort ascending" (click)="sort(true)">
+    <fileman-icon name="arrow-up" [size]="14"></fileman-icon>
+  </button>
+  <button type="button" class="fm-sort__btn" aria-label="Sort descending" title="Sort descending" (click)="sort(false)">
+    <fileman-icon name="arrow-down" [size]="14"></fileman-icon>
+  </button>
 </span>

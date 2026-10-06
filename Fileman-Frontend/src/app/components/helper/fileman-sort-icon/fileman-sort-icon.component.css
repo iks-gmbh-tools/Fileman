@@ -1,10 +1,5 @@
-.mat-icon {
-    color: blue;
-    background: lightgoldenrodyellow;
-    cursor: pointer;
-    font-size: 95%;
-    height: 12px;
-    text-align: center;
-    display: block;
-    margin: 2px;
-}
+/* Sort arrows in table headers (design system: FileTable, sortable column header) */
+:host { display: inline-flex; vertical-align: middle; margin-left: 4px; }
+.fm-sort { display: inline-flex; flex-direction: column; }
+.fm-sort__btn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 12px; padding: 0; border: 0; border-radius: 3px; background: transparent; color: var(--ink-muted); cursor: pointer; }
+.fm-sort__btn:hover { background: var(--primary-tint); color: var(--primary); }

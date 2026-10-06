@@ -30,10 +30,12 @@ import { FileGroupService } from 'src/app/services/fileman-filegroup-service.ser
 import { FilemanPreviewService } from 'src/app/services/fileman-preview-service.service';
 import { Utils } from 'src/app/common/Utils';
 import { UserRole, MultiselectDropdownSettings } from 'src/app/common/fileman-constants';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 
 @Component({
   selector: 'fileman-file-details',
-  templateUrl: './fileman-filemetadata-details.component.html',
+  templateUrl: './fileman-fileMetaData-details.component.html',
   styleUrls: ['./fileman-filemetadata-details.component.css']
 })
 export class FilemetadataDetailsComponent implements OnInit {
@@ -58,7 +60,9 @@ export class FilemetadataDetailsComponent implements OnInit {
               private fileService: FilemanFileService,
               private metadataService: FilemanMetadataService,
               private fileGroupService: FileGroupService,
-              private previewService: FilemanPreviewService) {
+              private previewService: FilemanPreviewService,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) {
       this.form = this.createFormGroup();
       this.reader = new FileReader();
       this.currentUser = authService.getCurrentUserName();
@@ -72,7 +76,7 @@ export class FilemetadataDetailsComponent implements OnInit {
       const filename = this.router.url.substring(index);
       this.toEdit = this.metadataService.getFileFromCache(filename);
       if (this.toEdit == null) {
-        alert('No data available for file "' + filename + '"!');
+        this.dialogService.alert('File not available', 'No data is loaded for "' + filename + '". Open it again from the file overview.');
         this.backToOverview();  // no data to edit avaible - happends for page reload - reason unclear
       } else {
         this.setDataToControls(this.toEdit);
@@ -123,21 +127,22 @@ export class FilemetadataDetailsComponent implements OnInit {
 
   save() {
     const fileData = this.getFileDataToSave();
-    console.log(fileData);
 
     if (this.newFileMode) {
       this.fileService.create(fileData)
           .subscribe(() => {
             this.previewService.preparePreview(fileData.getMetaData().getName());
+            this.toastService.success('Created ' + fileData.getMetaData().getName() + '.');
           }, error => {
-            alert('Error saving new file "' + fileData.getMetaData().getName() + '"!');
+            this.toastService.error('Creating ' + fileData.getMetaData().getName() + ' failed. Try again.');
           });
     } else {
       this.fileService.update(fileData)
           .subscribe(() => {
             this.previewService.preparePreview(fileData.getMetaData().getName());
+            this.toastService.success('Saved ' + fileData.getMetaData().getName() + '.');
           }, error => {
-            alert('Error saving updated file "' + fileData.getMetaData().getName() + '"!');
+            this.toastService.error('Saving ' + fileData.getMetaData().getName() + ' failed. Try again.');
           });
     }
 
@@ -179,7 +184,6 @@ export class FilemetadataDetailsComponent implements OnInit {
     this.reader.readAsBinaryString(this.selectedFileContentSource);
     this.reader.onload = (data) => {
       this.fileContent = btoa(this.reader.result as string);
-      console.log(this.fileContent);
     };
 
     if (this.nameC.value == null || this.nameC.value === '') {
@@ -198,6 +202,23 @@ export class FilemetadataDetailsComponent implements OnInit {
         this.fileContentC.setErrors({invalid: true});
       }
     }
+  }
+
+  getSelectedFileType(): string {
+    if (this.selectedFileContentSource == null) { return ''; }
+    return Utils.getFileExtension(this.selectedFileContentSource.name).toUpperCase().substr(0, 4);
+  }
+
+  getSelectedFileSize(): string {
+    if (this.selectedFileContentSource == null) { return ''; }
+    const bytes = this.selectedFileContentSource.size;
+    if (bytes < 1024) { return bytes + ' B'; }
+    if (bytes < 1024 * 1024) { return (bytes / 1024).toFixed(1) + ' KB'; }
+    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+  }
+
+  formatDate(nativeDateString: string): string {
+    return Utils.getFormattedDateString(nativeDateString);
   }
 
   backToOverview() {

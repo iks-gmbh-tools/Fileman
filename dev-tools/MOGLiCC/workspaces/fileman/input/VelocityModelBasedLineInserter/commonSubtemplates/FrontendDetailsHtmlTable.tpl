@@ -1,77 +1,41 @@
-'        <table class="form-group" formGroupName="detailsForm">
+'        <div class="fm-form-grid" formGroupName="detailsForm">
+
+## Fileman redesign: one fm-field per GUI attribute in a responsive two-column grid
+## (classes from src/styles/fileman.css). Label text: metainfo "guiLabel" if given, else the attribute name.
 
 #set( $attributeDescriptorList = $classDescriptor.getAttributeDescriptorList() )
-#set( $row1Attribute = "" )
-#set( $row2Attribute = "" )
 
-#foreach ($attributeDescriptor in $attributeDescriptorList)
+#foreach ($attribute in $attributeDescriptorList)
 
-	#if ( $attributeDescriptor.doesHaveAnyMetaInfosWithName("guiType"))
+	#if ( $attribute.doesHaveAnyMetaInfosWithName("guiType"))
 
-		#if ($row1Attribute.equals(""))
-			#set( $row1Attribute = $attributeDescriptor )
-		#elseif ($row2Attribute.equals("")) 
-			#set( $row2Attribute = $attributeDescriptor )
-		#end
-
-		#if ( ! $row2Attribute.equals("")) 
-'            <tr>
-			#if ( $row1Attribute.doesHaveAnyMetaInfosWithName("guiCondition"))
-'            	 <td *ngIf="${row1Attribute.getMetaInfoValueFor("guiCondition")}">
-			#else
-'                <td>
-			#end
-					 #set( $AttributeName = $TemplateStringUtility.firstToUpperCase($row1Attribute.name) ) 
-'                    <label for="$row1Attribute.name">$AttributeName</label>
-'                    <br>
-	         		 #set( $attribute = $row1Attribute )
-					 #parse("commonSubtemplates/SubTemplate_GuiElements.tpl")
-'                </td>
-			#if ( $row1Attribute.doesHaveAnyMetaInfosWithName("guiCondition"))
-'            	 <td *ngIf="${row1Attribute.getMetaInfoValueFor("guiCondition")}" class="space"></td>
-			#else
-'                <td class="space"></td>
-			#end
-			#if ( $row2Attribute.doesHaveAnyMetaInfosWithName("guiCondition"))
-'            	 <td *ngIf="${row2Attribute.getMetaInfoValueFor("guiCondition")}">
-			#else
-'                <td>
-			#end
-					 #set( $AttributeName = $TemplateStringUtility.firstToUpperCase($row2Attribute.name) ) 
-'                    <label for="$row2Attribute.name">$AttributeName</label>
-'                    <br>
-	         		 #set( $attribute = $row2Attribute )
-					 #parse("commonSubtemplates/SubTemplate_GuiElements.tpl")
-'                </td>
-'            </tr>
-'
-		#if ( $row1Attribute.doesHaveAnyMetaInfosWithName("guiCondition") && $row2Attribute.doesHaveAnyMetaInfosWithName("guiCondition"))
-'            <tr *ngIf="${row1Attribute.getMetaInfoValueFor("guiCondition")} || *ngIf="${row2Attribute.getMetaInfoValueFor("guiCondition")}">&nbsp;</tr>
+		#set( $fieldName = $TemplateStringUtility.firstToLowerCase($attribute.name) )
+		#set( $fieldName = $TemplateStringUtility.replaceAllIn($fieldName, " ", "") )
+		#if ( $attribute.doesHaveAnyMetaInfosWithName("guiLabel"))
+			#set( $guiLabel = $attribute.getMetaInfoValueFor("guiLabel") )
 		#else
-'            <tr>&nbsp;</tr>
+			#set( $guiLabel = $TemplateStringUtility.firstToUpperCase($fieldName) )
 		#end
-'            
-			#set( $row1Attribute = "" )
-			#set( $row2Attribute = "" )
-		#end			
+
+		#if ( $attribute.doesHaveAnyMetaInfosWithName("guiCondition"))
+'            <div class="fm-field" *ngIf="${attribute.getMetaInfoValueFor("guiCondition")}">
+		#else
+'            <div class="fm-field">
+		#end
+
+		#if ( $attribute.doesHaveMetaInfo("guiType", "Checkbox"))
+'                <label class="fm-checkfield" for="$fieldName">
+			#parse("commonSubtemplates/SubTemplate_GuiElements.tpl")
+'                    <span class="fm-label">$guiLabel</span>
+'                </label>
+		#else
+'                <label class="fm-label" for="$fieldName">$guiLabel</label>
+			#parse("commonSubtemplates/SubTemplate_GuiElements.tpl")
+		#end
+'            </div>
+
 	#end
-	
+
 #end
 
-#if ( ! $row1Attribute.equals("") && $row2Attribute.equals(""))
-	#if ( $row1Attribute.doesHaveAnyMetaInfosWithName("guiCondition"))
-'            <tr *ngIf="${row1Attribute.getMetaInfoValueFor("guiCondition")}">
-	#else
-'            <tr>
-	#end
-'                <td>
-					 #set( $AttributeName = $TemplateStringUtility.firstToUpperCase($row1Attribute.name) ) 
-'                    <label for="$row1Attribute.name">$AttributeName</label>
-'                    <br>
-	         		 #set( $attribute = $row1Attribute )
-					 #parse("commonSubtemplates/SubTemplate_GuiElements.tpl")
-'                </td>
-'            </tr>
-#end
-
-'        </table>
+'        </div>

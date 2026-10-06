@@ -1,25 +1,38 @@
-<li *ngFor="let file of viewedFiles; trackBy: trackFiles let i = index "
-    class="list-group-item">
-    <mat-icon data-toggle="tooltip" title="Download" (click)="download(file)">{{iconDownload}}</mat-icon>
-
-    <span *ngIf="! readOnly">
-        &nbsp;
-        <mat-icon  data-toggle="tooltip" title="Edit" (click)="edit(file)">{{iconEdit}}</mat-icon>
+<ul class="fm-list" aria-label="Files">
+  <li class="fm-row" *ngFor="let file of viewedFiles; trackBy: trackFiles; let i = index">
+    <button type="button" class="fm-icon-btn fm-star" data-option="change-favourite"
+            [attr.aria-pressed]="isFileFavourite(file.name)"
+            [attr.aria-label]="getFavouriteTooltip(file)" [title]="getFavouriteTooltip(file)"
+            (click)="changeFavouriteSetting(file)">
+      <fileman-icon [name]="getFavouriteIcon(file)" [size]="18"></fileman-icon>
+    </button>
+    <span class="fm-badge">{{getTypeBadge(file)}}</span>
+    <span class="fm-row__text" tooltip="{{getDetailsTooltip(file)}}">
+      <span class="fm-row__name">{{file.name}}</span>
+      <span class="fm-row__meta">{{getMetaLine(file)}}</span>
     </span>
-
-    <span *ngIf="! readOnly">
-        &nbsp;
-        <mat-icon *ngIf="! readOnly" data-toggle="tooltip" title="Delete" (click)="delete(file)">{{iconDelete}}</mat-icon>
+    <span class="fm-row__actions">
+      <button type="button" class="fm-icon-btn" data-option="download" aria-label="Download" title="Download" (click)="download(file)">
+        <fileman-icon name="download"></fileman-icon>
+      </button>
+      <button *ngIf="!readOnly" type="button" class="fm-icon-btn" data-option="edit" aria-label="Edit" title="Edit" (click)="edit(file)">
+        <fileman-icon name="edit"></fileman-icon>
+      </button>
+      <span class="fm-menu-anchor" filemanOutsideClickListener (clickedOutside)="closeMenu(i)" (keydown.escape)="closeMenu(i)">
+        <button type="button" class="fm-icon-btn" aria-haspopup="menu" [attr.aria-expanded]="isMenuOpen(i)"
+                aria-label="More actions" title="More actions" (click)="toggleMenu(i, $event)">
+          <fileman-icon name="more"></fileman-icon>
+        </button>
+        <div class="fm-menu fm-menu--floating" role="menu" [hidden]="!isMenuOpen(i)" [ngStyle]="menuStyle">
+          <button type="button" class="fm-menu__item" role="menuitem" data-option="show-history" (click)="closeMenu(); showHistory(file)">
+            <fileman-icon name="layers" [size]="18"></fileman-icon>Show history
+          </button>
+          <span *ngIf="!readOnly" class="fm-menu__sep" role="separator"></span>
+          <button *ngIf="!readOnly" type="button" class="fm-menu__item fm-menu__item--danger" role="menuitem" data-option="delete" (click)="closeMenu(); delete(file)">
+            <fileman-icon name="trash" [size]="18"></fileman-icon>Delete…
+          </button>
+        </div>
+      </span>
     </span>
-
-    &nbsp;
-    <mat-icon data-toggle="tooltip" title="Show History" (click)="showHistory(file)">{{iconShowHistory}}</mat-icon>
-    &nbsp;
-
-    <mat-icon data-toggle="tooltip" title="{{getFavouriteTooltip(file)}}" (click)="changeFavouriteSetting(file)"
-        [ngStyle]="{'backgroundColor': 'lavender'}">{{getFavouriteIcon(file)}}</mat-icon>
-    &nbsp;
-    <span tooltip="{{getDetailsTooltip(file)}}">
-        {{i+1}}. {{file.name}}
-    </span>
-</li>
+  </li>
+</ul>

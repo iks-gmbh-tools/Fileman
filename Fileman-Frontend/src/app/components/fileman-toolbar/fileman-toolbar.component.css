@@ -1,25 +1,3 @@
-mat-toolbar {
-  height: 50px;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-fileman-logo {
-  margin-top: 10px;
-}
-
-.mat-icon {
-  color: lightgoldenrodyellow;
-  background: blue;
-  cursor: pointer;
-}
-
-.separator {
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-bottom: 5px;
-}
-
-.spacer {
-  flex: 1 1 auto;
-}
+/* Header and page toolbar: styles come from src/styles/fileman.css (fm-header, fm-toolbar, fm-seg ...). */
+:host { display: block; }
+.fm-main--head { padding-bottom: 0; }

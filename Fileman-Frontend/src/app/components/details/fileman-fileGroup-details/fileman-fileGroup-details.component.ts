@@ -25,11 +25,13 @@ import { MultiselectDropdownSettings } from 'src/app/common/fileman-constants';
 import { FileMetaData } from 'src/app/common/domainobjects/gen/FileMetaData';
 import { Utils } from 'src/app/common/Utils';
 import { FilemanMetadataService } from 'src/app/services/fileman-metadata-service.service';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 
 @Component({
   selector: 'fileman-filegroup-details',
-  templateUrl: './fileman-filegroup-details.component.html',
-  styleUrls: ['./fileman-filegroup-details.component.css']
+  templateUrl: './fileman-fileGroup-details.component.html',
+  styleUrls: ['./fileman-fileGroup-details.component.css']
 })
 export class FileGroupDetailsComponent implements OnInit {
 
@@ -45,7 +47,9 @@ export class FileGroupDetailsComponent implements OnInit {
   constructor(private router: Router,
               private authService: FilemanAuthserviceService,
               private fileGroupService: FileGroupService,
-              private metadataService: FilemanMetadataService) {
+              private metadataService: FilemanMetadataService,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) {
       this.form = this.createFormGroup();
       this.currentlyLoggedInUser = authService.getCurrentUserName();
   }
@@ -60,7 +64,7 @@ export class FileGroupDetailsComponent implements OnInit {
       this.fileGroupService.getFileGroup(id).subscribe(fileGroup => {
         this.toEdit = new FileGroup(fileGroup);
         if (this.toEdit == null) {
-          alert('No data available for file group "' + id + '"!');
+          this.dialogService.alert('File group not available', 'No data is loaded for this file group. Open it again from the overview.');
           this.backToOverview();  // no data to edit available - happens for page reload - reason unclear
         } else {
           this.setDataToControls(this.toEdit);
@@ -95,22 +99,22 @@ export class FileGroupDetailsComponent implements OnInit {
       name: this.nameC.value.trim(),
       files: this.filesC.value
     });
-    console.log('Saving ');
-    console.log(toSave);
 
     if (this.newMode) {
       this.fileGroupService.create(toSave)
           .subscribe(() => {
             this.metadataService.markDataAsOutdated();
+            this.toastService.success('Created file group ' + toSave.getName() + '.');
           }, error => {
-            alert('Error saving new file group with name "' + toSave.getName() + '"!');
+            this.toastService.error('Creating file group ' + toSave.getName() + ' failed. Try again.');
           });
     } else {
       this.fileGroupService.update(toSave)
           .subscribe(() => {
             this.metadataService.markDataAsOutdated();
+            this.toastService.success('Saved file group ' + toSave.getName() + '.');
           }, error => {
-            alert('Error updating file group with ID "' + toSave.getId() + '"!');
+            this.toastService.error('Saving file group ' + toSave.getName() + ' failed. Try again.');
           });
     }
 

@@ -29,6 +29,8 @@ import { FilemanUserPreferencesService } from 'src/app/services/fileman-user-pre
 import { UserPreferences } from 'src/app/common/domainobjects/gen/UserPreferences';
 import { FilemanSearchService } from 'src/app/services/fileman-search-service.service';
 import { FilemanReloadService } from 'src/app/services/fileman-reload-service.service';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 
 @Component({
   selector: 'fileman-user-overview',
@@ -58,12 +60,11 @@ export class FilemanUserOverviewComponent implements OnInit, OnDestroy {
               private avatarService: FilemanAvatarService,
               private userPreferencesService: FilemanUserPreferencesService,
               private searchService: FilemanSearchService,
-              private reloadService: FilemanReloadService) {
-                  console.log('########### overview constr');
-              }
+              private reloadService: FilemanReloadService,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) {}
 
   ngOnInit(): void {
-    console.log('### user overview init')
     this.currentUserName = this.authService.getCurrentUserName();
     this.userPreferences = this.userPreferencesService.getUserPreferences();
     this.userPreferencesSubscription =
@@ -132,8 +133,19 @@ export class FilemanUserOverviewComponent implements OnInit, OnDestroy {
   }
 
   delete(user: User) {
-    const ok = confirm('Are you sure to delete "' + user.getName() + '"?');
-    if (! ok) {return;}
+    this.dialogService.confirm({
+      title: 'Delete ' + user.getName() + '?',
+      message: 'The user is removed for everyone. This can\'t be undone.',
+      confirmLabel: 'Delete user',
+      danger: true
+    }).then(ok => {
+      if (ok) {
+        this.deleteConfirmed(user);
+      }
+    });
+  }
+
+  private deleteConfirmed(user: User) {
     const toDelete = this.allUsersMap.get(user.getName());
     this.allUsersMap.delete(user.getName());
     const index = this.viewedUsers.indexOf(toDelete);
@@ -143,7 +155,7 @@ export class FilemanUserOverviewComponent implements OnInit, OnDestroy {
         .delete(user)
         .subscribe(
           deletedUser => {
-              console.log('Successfully deleted user: ' + user.getName());
+              this.toastService.success('Deleted ' + user.getName() + '.');
             },
           (error: FilemanError) => {
             this.viewedUsers.splice(index, 0, toDelete);  // roll back optimistic deletion
@@ -151,12 +163,16 @@ export class FilemanUserOverviewComponent implements OnInit, OnDestroy {
 
             if (error instanceof FilemanNotfoundError) {
               // TODO this.form.setErrors(error.cause);
-              alert('User does not (more?) exist.')
+              this.dialogService.alert('User not found', user.getName() + ' doesn\'t exist anymore. Reload to see the current users.')
             } else {
               throw error;
             }
           }
         );
+  }
+
+  clearSearch() {
+    this.searchService.setSearchString('');
   }
 
   ngOnDestroy() {

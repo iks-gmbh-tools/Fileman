@@ -28,6 +28,8 @@ import { FilemanUserPreferencesService } from 'src/app/services/fileman-user-pre
 import { UserPreferences } from 'src/app/common/domainobjects/gen/UserPreferences';
 import { FilemanSearchService } from 'src/app/services/fileman-search-service.service';
 import { FilemanReloadService } from 'src/app/services/fileman-reload-service.service';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 
 @Component({
   selector: 'fileman-tenant-overview',
@@ -56,12 +58,11 @@ export class FilemanTenantOverviewComponent implements OnInit, OnDestroy {
               private tenantService: TenantService,
               private userPreferencesService: FilemanUserPreferencesService,
               private searchService: FilemanSearchService,
-              private reloadService: FilemanReloadService) {
-                  console.log('########### overview constr');
-              }
+              private reloadService: FilemanReloadService,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) {}
 
   ngOnInit(): void {
-    console.log('### tenant overview init')
     this.currentUserName = this.authService.getCurrentUserName();
     this.userPreferences = this.userPreferencesService.getUserPreferences();
     this.userPreferencesSubscription =
@@ -129,8 +130,19 @@ export class FilemanTenantOverviewComponent implements OnInit, OnDestroy {
   }
 
   delete(tenant: Tenant) {
-    const ok = confirm('Are you sure to delete "' + tenant.getName() + '"?');
-    if (! ok) {return;}
+    this.dialogService.confirm({
+      title: 'Delete ' + tenant.getName() + '?',
+      message: 'The tenant is removed for everyone. This can\'t be undone.',
+      confirmLabel: 'Delete tenant',
+      danger: true
+    }).then(ok => {
+      if (ok) {
+        this.deleteConfirmed(tenant);
+      }
+    });
+  }
+
+  private deleteConfirmed(tenant: Tenant) {
     const toDelete = this.allTenantsMap.get(tenant.getName());
     this.allTenantsMap.delete(tenant.getName());
     const index = this.viewedTenants.indexOf(toDelete);
@@ -140,7 +152,7 @@ export class FilemanTenantOverviewComponent implements OnInit, OnDestroy {
         .delete(tenant)
         .subscribe(
           deletedTenant => {
-              console.log('Successfully deleted tenant: ' + tenant.getName());
+              this.toastService.success('Deleted ' + tenant.getName() + '.');
             },
           (error: FilemanError) => {
             this.viewedTenants.splice(index, 0, toDelete);  // roll back optimistic deletion
@@ -148,12 +160,16 @@ export class FilemanTenantOverviewComponent implements OnInit, OnDestroy {
 
             if (error instanceof FilemanNotfoundError) {
               // TODO this.form.setErrors(error.cause);
-              alert('Tenant does not (more?) exist.')
+              this.dialogService.alert('Tenant not found', tenant.getName() + ' doesn\'t exist anymore. Reload to see the current tenants.')
             } else {
               throw error;
             }
           }
         );
+  }
+
+  clearSearch() {
+    this.searchService.setSearchString('');
   }
 
   ngOnDestroy() {

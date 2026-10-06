@@ -1,5 +1,16 @@
-.mat-icon {
-  color: blue;
-  background: lightgoldenrodyellow;
-  cursor: pointer;
-}
+/* User list layout (design system: FileListItem). Shared styles: src/styles/fileman.css */
+:host { display: block; }
+.fm-row__name { font-weight: 600; overflow-wrap: anywhere; }
+.fm-row__actions { display: inline-flex; align-items: center; margin-left: auto; }
+.fm-row__lead { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--radius-lg); background: var(--primary-tint); color: var(--primary); }
+.fm-row__lead--avatar { border-radius: var(--radius-full); overflow: hidden; font-weight: 700; font-size: 14px; }
+.fm-row__lead--avatar img { width: 100%; height: 100%; object-fit: cover; }
+.fm-pills { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 320px; min-width: 0; }
+.fm-strong { font-weight: 600; }
+.fm-row--menu-open { background: var(--selected-row); }
+th { white-space: nowrap; }
+.fm-tile__hero { display: flex; align-items: center; justify-content: center; height: 132px; background: var(--primary-tint); color: var(--primary); }
+.fm-tile__hero .fm-avatar { width: 88px; height: 88px; font-size: 30px; font-weight: 700; background: var(--surface); color: var(--primary); overflow: hidden; }
+.fm-tile__hero .fm-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.fm-tile__hero--folder { background: var(--tint-templates); color: var(--ink); }
+.fm-tile__body .fm-pills { margin-top: 6px; }

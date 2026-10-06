@@ -1,31 +1,41 @@
-<form [formGroup]="form" (ngSubmit)="save()">
+<div class="fm-page">
+  <fileman-toolbar [showPageToolbar]="false"></fileman-toolbar>
 
-    <h2>
-        <fileman-logo></fileman-logo>
-        <span *ngIf="newMode">Details of new <<Type>></span>
-        <span *ngIf="! newMode">Edit <<Type>> Details</span>
-    </h2>
+  <main class="fm-form-page fm-form-page--narrow">
+    <nav class="fm-crumbs" aria-label="Breadcrumb">
+      <a href="" (click)="$event.preventDefault(); cancel()"><<Type>>s</a>
+      <span aria-hidden="true">›</span>
+      {{newMode ? 'New <<type>>' : toEdit?.name}}
+    </nav>
+    <h1 class="fm-title">{{newMode ? 'New <<type>>' : 'Edit <<type>>'}}</h1>
 
-    <div class="form-group" formGroupName="inputFieldControl">
+    <form class="fm-form-card" [formGroup]="form" (ngSubmit)="save()">
+      <div class="fm-form-card__body" formGroupName="inputFieldControl">
 
-        <!-- The table section below is generated: Do not modify manually! -->
-        <!-- The table section above is generated: Do not modify manually! -->
-
-        <div class="form-group alert alert-danger" *ngIf="detailsForm.invalid && detailsForm.touched">
-            Validation errors:
+        <div class="fm-alert" role="alert"
+             *ngIf="(detailsForm.errors && detailsForm.touched)
+                 || (nameC.errors && nameC.touched)">
+          <fileman-icon name="alert"></fileman-icon>
+          <div class="fm-errors">
 
             <!-- The error sections below are generated: Do not modify manually! -->
             <!-- The error sections above are generated: Do not modify manually! -->
 
+          </div>
         </div>
 
-        <button *ngIf="!readOnly"
-                [disabled]=" ! detailsForm.touched || detailsForm.invalid"
-                class="button btn btn-primary"
-                type="submit"
-                data-toggle="tooltip" title="{{getToolTip()}}"
-        >Save</button>
-        &nbsp;
-        <button type="button" class="btn btn-primary" (click)="cancel()">Cancel</button>
-    </div>
-</form>
+        <!-- The table section below is generated: Do not modify manually! -->
+        <!-- The table section above is generated: Do not modify manually! -->
+
+      </div>
+
+      <div class="fm-form-card__actions">
+        <button type="button" class="fm-btn" (click)="cancel()">Cancel</button>
+        <button *ngIf="!readOnly" type="submit" class="fm-btn fm-btn--primary"
+                [disabled]="(! detailsForm.touched || detailsForm.invalid)
+                    && (! nameC.touched && nameC.invalid)"
+                [title]="getToolTip()">{{newMode ? 'Create <<type>>' : 'Save changes'}}</button>
+      </div>
+    </form>
+  </main>
+</div>

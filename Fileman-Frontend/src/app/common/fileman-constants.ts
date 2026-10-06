@@ -33,28 +33,41 @@ export enum PreviewType {Text = 'preview_type_text',
                     Image = 'preview_type_image',
                     PDF = 'preview_type_pdf',
                     DOCX = 'preview_type_docx'}
+// Names of the inline SVG icons drawn by <fileman-icon> (see components/ui/fileman-icon.component.ts).
 export enum Icon {List = 'list',
-                    Table = 'border_all',
-                    Tiles = 'view_module',
-                    New = 'note_add',
+                    Table = 'table',
+                    Tiles = 'tiles',
+                    New = 'plus',
                     Reload = 'refresh',
-                    Database = 'storage',
-                    Logout = 'exit_to_app',
-                    Download = 'arrow_downwards',
+                    Database = 'database',
+                    Logout = 'logout',
+                    Download = 'download',
                     Edit = 'edit',
-                    Delete = 'delete',
+                    Delete = 'trash',
                     ShowHistory = 'layers',
-                    FavouriteFilterActive = 'star',
-                    FavouriteFilterInactive = 'star_border'}
+                    FavouriteFilterActive = 'star-filled',
+                    FavouriteFilterInactive = 'star',
+                    More = 'more',
+                    Search = 'search',
+                    Close = 'close',
+                    Check = 'check',
+                    Alert = 'alert',
+                    Upload = 'upload',
+                    File = 'file',
+                    Folder = 'folder',
+                    User = 'user',
+                    Tenant = 'building',
+                    SortAscending = 'arrow-up',
+                    SortDescending = 'arrow-down'}
 
 export const FilemanTooltipOptions: TooltipOptions = {
-  placement: 'right',
-  theme: 'light',
-  width: 300,
+  'placement': 'right',
+  'theme': 'light',
+  'width': 300,
   'max-width': 600,
   'show-delay': 500,
   'tooltip-class': 'global-tooltip-style'
-};
+}
 
 export const MultiselectDropdownSettings = {
   singleSelection: false,
@@ -73,7 +86,7 @@ export const MultiselectDropdownSettings = {
   closeDropDownOnSelection: false,
   showSelectedItemsAtTop: false,
   defaultOpen: false
-};
+}
 
 export class FilemanConstants
 {

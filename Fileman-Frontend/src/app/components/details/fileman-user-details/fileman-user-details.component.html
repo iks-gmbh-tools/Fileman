@@ -1,141 +1,137 @@
-<form [formGroup]="form" (ngSubmit)="save()">
+<div class="fm-page">
+  <fileman-toolbar [showPageToolbar]="false"></fileman-toolbar>
 
-    <h2>
-        <fileman-logo></fileman-logo>
-        <span *ngIf="newMode">Details of new User</span>
-        <span *ngIf="! newMode">Edit User Details</span>
-    </h2>
+  <main class="fm-form-page">
+    <nav class="fm-crumbs" aria-label="Breadcrumb">
+      <a href="" (click)="$event.preventDefault(); cancel()">Users</a>
+      <span aria-hidden="true">›</span>
+      {{newMode ? 'New user' : toEdit?.name}}
+    </nav>
+    <h1 class="fm-title">{{newMode ? 'New user' : 'Edit user'}}</h1>
 
-    <div class="form-group" formGroupName="inputFieldControl">
+    <form class="fm-form-card" [formGroup]="form" (ngSubmit)="save()">
+      <div class="fm-form-card__body" formGroupName="inputFieldControl">
 
-        <!-- The table section below is generated: Do not modify manually! -->
-        <table class="form-group" formGroupName="detailsForm">
-            <tr>
-                <td>
-                    <label for="name">Name</label>
-                    <br>
-                    <input id="name" type="text" class="form-Control" formControlName="nameControl"/>
-                </td>
-                <td class="space"></td>
-                <td>
-                    <label for="role">Role</label>
-                    <br>
-                    <select id="role" class="form-Control" formControlName="roleControl" (change)="roleC.markAsTouched()">
-                        <option [value]="'Reader'">Reader</option>
-                        <option [value]="'Writer'">Writer</option>
-                        <option [value]="'Admin'">Admin</option>
-                    </select>
-                </td>
-            </tr>
-
-            <tr>&nbsp;</tr>
-
-            <tr>
-                <td>
-                    <label for="tenants">Tenants</label>
-                    <br>
-                    <ng-multiselect-dropdown
-                      id="tenants"
-                      class="form-Control"
-                      formControlName="tenantsControl"
-                      [placeholder]="'Click to select'"
-                      [data]="tenants"
-                      (onSelect)="tenantsC.markAsTouched()"
-                      (onSelectAll)="tenantsC.markAsTouched()"
-                      (onDeSelect)="tenantsC.markAsTouched()"
-                      (onDeSelectAll)="tenantsC.markAsTouched()"
-                      [settings]="tenantsMultiselectDropdownSettings">
-                    </ng-multiselect-dropdown>
-                </td>
-                <td class="space"></td>
-                <td>
-                    <label for="password">Password</label>
-                    <br>
-                    <input id="password" type="password" class="form-Control" formControlName="passwordControl"/>
-                </td>
-            </tr>
-
-            <tr>&nbsp;</tr>
-
-            <tr>
-                <td>
-                    <label for="passwordRepetition">PasswordRepetition</label>
-                    <br>
-                    <input id="passwordRepetition" type="password" class="form-Control" formControlName="passwordRepetitionControl"/>
-                </td>
-                <td class="space"></td>
-                <td>
-                    <label for="avatar">Avatar</label>
-                    <br>
-                    <input id="fileContentSource" class="form-Control" type="file"
-                    formControlName="avatarControl"
-                    (change)="onAvatarChange($event)"
-                    [style.border]="getBorder()"
-                    (focus)="setFocusOnFileSelector(true)" (blur)="setFocusOnFileSelector(false)"/>
-                </td>
-            </tr>
-
-            <tr>&nbsp;</tr>
-
-        </table>
-        <!-- The table section above is generated: Do not modify manually! -->
-
-        <tr *ngIf="hasAvatar()">
-          <img class="image-preview" [src]="getAvatar()">&nbsp;
-          <button type="button" class="btn btn-info" (click)="clearAvatar()">Clear avatar</button>
-        </tr>
-        <br>
-
-        <div class="form-group alert alert-danger"
-            *ngIf="(detailsForm.errors && detailsForm.touched)
-              || (nameC.errors && nameC.touched)
-              || (roleC.errors && roleC.touched)
-              || (passwordC.errors && passwordC.touched)
-              || (passwordRepetitionC.errors && passwordRepetitionC.touched)
-              || avatarC.errors">
-            Validation errors:
+        <div class="fm-alert" role="alert"
+             *ngIf="(detailsForm.errors && detailsForm.touched)
+               || (nameC.errors && nameC.touched)
+               || (roleC.errors && roleC.touched)
+               || (passwordC.errors && passwordC.touched)
+               || (passwordRepetitionC.errors && passwordRepetitionC.touched)
+               || avatarC.errors">
+          <fileman-icon name="alert"></fileman-icon>
+          <div class="fm-errors">
 
             <!-- The error sections below are generated: Do not modify manually! -->
             <div *ngIf="nameC.errors?.required && nameC.touched">
-               The field <i>Name</i> is required.
+               Name is required.
             </div>
             <div *ngIf="nameC.errors?.minlength && nameC.touched">
-               Minimum length of field <i>Name</i> is {{nameC.errors.minlength.requiredLength}}.
+               Name needs at least {{nameC.errors.minlength.requiredLength}} characters.
             </div>
             <div *ngIf="nameC.errors?.isNotUnique">
-               The value for field <i>Name</i> must be unique! <i>{{nameC.value}}</i> is not unique.
+               Name “{{nameC.value}}” already exists. Choose another one.
             </div>
             <div *ngIf="roleC.errors?.required && roleC.touched">
-               The field <i>Role</i> is required.
+               Role is required.
             </div>
             <div *ngIf="tenantsC.errors?.required && tenantsC.touched">
-               The field <i>Tenants</i> is required.
+               Tenants is required.
             </div>
             <div *ngIf="passwordC.errors?.minlength && passwordC.touched">
-               Minimum length of field <i>Password</i> is {{passwordC.errors.minlength.requiredLength}}.
+               Password needs at least {{passwordC.errors.minlength.requiredLength}} characters.
             </div>
             <div *ngIf="passwordRepetitionC.errors?.minlength && passwordRepetitionC.touched">
-               Minimum length of field <i>PasswordRepetition</i> is {{passwordRepetitionC.errors.minlength.requiredLength}}.
+               Repeat password needs at least {{passwordRepetitionC.errors.minlength.requiredLength}} characters.
             </div>
             <!-- The error sections above are generated: Do not modify manually! -->
+
             <div *ngIf="avatarC.errors?.wrongContentType">
-               Invalid content type for selected file in field <i>Avatar</i>.
-           </div>
-           <div *ngIf="passwordC.errors?.noPasswordGivenForNewUser && passwordC.touched">
+               Choose an image file (PNG or JPG) for the avatar.
+            </div>
+            <div *ngIf="passwordC.errors?.noPasswordGivenForNewUser && passwordC.touched">
                A password is required for new users.
-           </div>
-           <div *ngIf="detailsForm.errors?.passwordFieldsDontMatch">
-               Password fields don't match.
-           </div>
+            </div>
+            <div *ngIf="detailsForm.errors?.passwordFieldsDontMatch">
+               The passwords don't match.
+            </div>
+          </div>
         </div>
 
-        <button *ngIf="!readOnly"
-                [disabled]=" ! detailsForm.touched || detailsForm.invalid"
-                class="button btn btn-primary"
-                type="submit"
-                data-toggle="tooltip" title="{{getToolTip()}}"
-        >Save</button>
-        &nbsp;
-        <button type="button" class="btn btn-primary" (click)="cancel()">Cancel</button>
-    </div>
-</form>
+        <div class="fm-avatar-field">
+          <span class="fm-avatar fm-avatar--lg" aria-hidden="true">
+            <img *ngIf="hasAvatar()" [src]="getAvatar()" alt="">
+            <span *ngIf="!hasAvatar()">{{getInitials()}}</span>
+          </span>
+          <div class="fm-avatar-field__text">
+            <span class="fm-label">Avatar preview</span>
+            <span class="fm-help">Optional. Choose an image below; until then the initials are shown.</span>
+            <div><button *ngIf="hasAvatar()" type="button" class="fm-btn" (click)="clearAvatar()">Remove avatar</button></div>
+          </div>
+        </div>
+
+        <!-- The table section below is generated: Do not modify manually! -->
+        <div class="fm-form-grid" formGroupName="detailsForm">
+            <div class="fm-field">
+                <label class="fm-label" for="name">Name</label>
+                <input id="name" type="text" class="fm-input" formControlName="nameControl"/>
+            </div>
+            <div class="fm-field">
+                <label class="fm-label" for="role">Role</label>
+                <select id="role" class="fm-select" formControlName="roleControl" (change)="roleC.markAsTouched()">
+                    <option [value]="'Reader'">Reader</option>
+                    <option [value]="'Writer'">Writer</option>
+                    <option [value]="'Admin'">Admin</option>
+                </select>
+            </div>
+            <div class="fm-field">
+                <label class="fm-label" for="tenants">Tenants</label>
+                <ng-multiselect-dropdown
+                  id="tenants"
+                  formControlName="tenantsControl"
+                  [placeholder]="'Choose…'"
+                  [data]="tenants"
+                  (onSelect)="tenantsC.markAsTouched()"
+                  (onSelectAll)="tenantsC.markAsTouched()"
+                  (onDeSelect)="tenantsC.markAsTouched()"
+                  (onDeSelectAll)="tenantsC.markAsTouched()"
+                  [settings]="tenantsMultiselectDropdownSettings">
+                </ng-multiselect-dropdown>
+            </div>
+            <div class="fm-field">
+                <label class="fm-label" for="password">Password</label>
+                <input id="password" type="password" class="fm-input" formControlName="passwordControl"/>
+            </div>
+            <div class="fm-field">
+                <label class="fm-label" for="passwordRepetition">Repeat password</label>
+                <input id="passwordRepetition" type="password" class="fm-input" formControlName="passwordRepetitionControl"/>
+            </div>
+            <div class="fm-field">
+                <label class="fm-label" for="avatar">Avatar</label>
+                <input id="avatar" class="fm-file-input" type="file"
+                       formControlName="avatarControl"
+                       (change)="onAvatarChange($event)"
+                       (focus)="setFocusOnFileSelector(true)" (blur)="setFocusOnFileSelector(false)"/>
+                <div class="fm-drop">
+                    <fileman-icon name="upload"></fileman-icon>
+                    <label for="avatar" class="fm-btn">Choose file</label>
+                </div>
+            </div>
+        </div>
+        <!-- The table section above is generated: Do not modify manually! -->
+
+        <p class="fm-help fm-role-help">
+          <strong>Reader</strong> views and downloads files. <strong>Writer</strong> also adds, edits and deletes files.
+          <strong>Admin</strong> also manages users, tenants and file groups.
+        </p>
+      </div>
+
+      <div class="fm-form-card__actions">
+        <button type="button" class="fm-btn" (click)="cancel()">Cancel</button>
+        <button *ngIf="!readOnly" type="submit" class="fm-btn fm-btn--primary"
+                [disabled]="!detailsForm.touched || detailsForm.invalid"
+                [title]="getToolTip()">{{newMode ? 'Create user' : 'Save changes'}}</button>
+      </div>
+    </form>
+  </main>
+</div>

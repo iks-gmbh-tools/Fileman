@@ -1,36 +1,38 @@
-<hr style="background: blue">
+<div class="fm-overview">
 
-<h5>FileGroups:</h5>
-<div *ngIf="allFileGroupsMap.size == 0">
-    <i>None.</i>
-</div>
-<div *ngIf="viewedFileGroups.length == 0 && allFileGroupsMap.size > 0">
-    <i>No fileGroup matches your filter.</i>
-</div>
+  <section class="fm-empty" *ngIf="allFileGroupsMap.size == 0">
+    <span class="fm-empty__icon"><fileman-icon name="folder" [size]="26"></fileman-icon></span>
+    <h2>No file groups yet</h2>
+    <p>Use “New file group” above to add the first one.</p>
+  </section>
 
-<div [ngSwitch]="userPreferences.layoutType">
-    <div *ngSwitchCase="layoutTypeList">
-        <fileman-filegroup-list-layout
-          [viewedFileGroups]="viewedFileGroups"
-          [readOnly]="readOnly"
-          (fileGroupEdited)="edit($event)"
-          (fileGroupDeleted)="delete($event)">
-        </fileman-filegroup-list-layout>
+  <section class="fm-empty" *ngIf="viewedFileGroups.length == 0 && allFileGroupsMap.size > 0">
+    <span class="fm-empty__icon"><fileman-icon name="search" [size]="26"></fileman-icon></span>
+    <h2>No file groups match “{{searchString}}”</h2>
+    <p>Check the spelling, or clear the search.</p>
+    <div class="fm-empty__actions">
+      <button type="button" class="fm-btn" (click)="clearSearch()">Clear search</button>
     </div>
-    <div *ngSwitchCase="layoutTypeTable">
-      <fileman-filegroup-table-layout
-        [viewedFileGroups]="viewedFileGroups"
-        [readOnly]="readOnly"
-        (fileGroupEdited)="edit($event)"
-        (fileGroupDeleted)="delete($event)">
-      </fileman-filegroup-table-layout>
-    </div>
-    <div *ngSwitchCase="layoutTypeTiles">
-        <fileman-filegroup-tiles-layout
-          [viewedFileGroups]="viewedFileGroups"
-          [readOnly]="readOnly"
-          (fileGroupEdited)="edit($event)"
-          (fileGroupDeleted)="delete($event)">
-        </fileman-filegroup-tiles-layout>
-    </div>
+  </section>
+
+  <div *ngIf="viewedFileGroups.length > 0" [ngSwitch]="userPreferences.layoutType">
+    <fileman-filegroup-list-layout *ngSwitchCase="layoutTypeList"
+      [viewedFileGroups]="viewedFileGroups"
+      [readOnly]="readOnly"
+      (fileGroupEdited)="edit($event)"
+      (fileGroupDeleted)="delete($event)">
+    </fileman-filegroup-list-layout>
+    <fileman-filegroup-table-layout *ngSwitchCase="layoutTypeTable"
+      [viewedFileGroups]="viewedFileGroups"
+      [readOnly]="readOnly"
+      (fileGroupEdited)="edit($event)"
+      (fileGroupDeleted)="delete($event)">
+    </fileman-filegroup-table-layout>
+    <fileman-filegroup-tiles-layout *ngSwitchCase="layoutTypeTiles"
+      [viewedFileGroups]="viewedFileGroups"
+      [readOnly]="readOnly"
+      (fileGroupEdited)="edit($event)"
+      (fileGroupDeleted)="delete($event)">
+    </fileman-filegroup-tiles-layout>
+  </div>
 </div>

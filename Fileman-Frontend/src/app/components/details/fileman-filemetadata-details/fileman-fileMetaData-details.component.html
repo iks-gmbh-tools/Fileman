@@ -1,110 +1,119 @@
-<form [formGroup]="form" (ngSubmit)="save()">
+<div class="fm-page">
+  <fileman-toolbar [showPageToolbar]="false"></fileman-toolbar>
 
-    <h2>
-        <fileman-logo></fileman-logo>
-        <span *ngIf="newFileMode">Details of new File</span>
-        <span *ngIf="! newFileMode">Edit File Details</span>
-    </h2>
+  <main class="fm-form-page">
+    <nav class="fm-crumbs" aria-label="Breadcrumb">
+      <a href="" (click)="$event.preventDefault(); cancel()">Files</a>
+      <span aria-hidden="true">›</span>
+      {{newFileMode ? 'New file' : toEdit?.name}}
+    </nav>
+    <div class="fm-heading">
+      <h1 class="fm-title">{{newFileMode ? 'New file' : 'Edit file'}}</h1>
+      <span class="fm-muted" *ngIf="!newFileMode">Choosing new content stores it as a new version.</span>
+    </div>
 
-    <div class="form-group" formGroupName="inputFieldControl">
+    <form class="fm-form-card" [formGroup]="form" (ngSubmit)="save()">
+      <div class="fm-form-card__body" formGroupName="inputFieldControl">
 
-        <div class="details">
-            <label for="fileContentSource">File Content Source</label>
-            <br>
-            <input id="fileContentSource" class="form-Control" type="file"
-                   formControlName="fileContentControl"
-                   (change)="onFileContentSourceChange($event)"
-                   [style.border]="getBorder()"
-                   (focus)="setFocusOnFileSelector(true)" (blur)="setFocusOnFileSelector(false)"/>
-            <br>
-        </div>
-
-        <br>
-
-        <!-- The table section below is generated: Do not modify manually! -->
-        <table class="form-group" formGroupName="detailsForm">
-            <tr>
-                <td>
-                    <label for="name">Name</label>
-                    <br>
-                    <input id="name" type="text" class="form-Control" formControlName="nameControl"/>
-                </td>
-                <td class="space"></td>
-                <td>
-                    <label for="description">Description</label>
-                    <br>
-                    <textarea id="description" class="form-Control" formControlName="descriptionControl"></textarea>
-                </td>
-            </tr>
-
-            <tr>&nbsp;</tr>
-
-            <tr>
-            	 <td *ngIf="!newFileMode">
-                    <label for="immediately Active">Immediately Active</label>
-                    <br>
-                    <input id="immediatelyActive" type="checkbox" class="form-Control" formControlName="immediatelyActiveControl"/>
-                </td>
-            	 <td *ngIf="!newFileMode" class="space"></td>
-                <td>
-                    <label for="fileGroups">FileGroups</label>
-                    <br>
-                    <ng-multiselect-dropdown
-                      id="fileGroups"
-                      class="form-Control"
-                      formControlName="fileGroupsControl"
-                      [placeholder]="'Click to select'"
-                      [data]="fileGroups"
-                      (onSelect)="fileGroupsC.markAsTouched()"
-                      (onSelectAll)="fileGroupsC.markAsTouched()"
-                      (onDeSelect)="fileGroupsC.markAsTouched()"
-                      (onDeSelectAll)="fileGroupsC.markAsTouched()"
-                      [settings]="fileGroupsMultiselectDropdownSettings">
-                    </ng-multiselect-dropdown>
-                </td>
-            </tr>
-
-            <tr>&nbsp;</tr>
-
-        </table>
-        <!-- The table section above is generated: Do not modify manually! -->
-
-        <div class="form-group alert alert-danger" *ngIf="(detailsForm.invalid && detailsForm.touched) || showFileSelectorMandatoryMessage() || techTypeMismatch">
-            Validation errors:
+        <div class="fm-alert" role="alert"
+             *ngIf="(detailsForm.invalid && detailsForm.touched) || showFileSelectorMandatoryMessage() || techTypeMismatch">
+          <fileman-icon name="alert"></fileman-icon>
+          <div class="fm-errors">
 
             <!-- The error sections below are generated: Do not modify manually! -->
             <div *ngIf="nameC.errors?.required && nameC.touched">
-               The field <i>Name</i> is required.
+               Name is required.
             </div>
             <div *ngIf="nameC.errors?.minlength && nameC.touched">
-               Minimum length of field <i>Name</i> is {{nameC.errors.minlength.requiredLength}}.
+               Name needs at least {{nameC.errors.minlength.requiredLength}} characters.
             </div>
             <div *ngIf="nameC.errors?.doesNotContainSpace">
-               No spaces are allowed in field <i>Name</i>!
+               Name can't contain spaces.
             </div>
             <div *ngIf="nameC.errors?.isNotUnique">
-               The value for field <i>Name</i> must be unique! <i>{{nameC.value}}</i> is not unique.
+               Name “{{nameC.value}}” already exists. Choose another one.
             </div>
             <!-- The error sections above are generated: Do not modify manually! -->
 
             <div *ngIf="techTypeMismatch">
-                The selected file does not match the TechType (i.e. file extension) of the original file.
+               Choose a .{{toEdit?.techType}} file: new content must keep the file type of the original.
             </div>
-
             <div *ngIf="showFileSelectorMandatoryMessage()">
-                File content is required.
+               Choose the file content.
             </div>
+          </div>
         </div>
 
-        <button *ngIf="!readOnly"
+        <div class="fm-field">
+          <span class="fm-label">{{newFileMode ? 'File content' : 'New content'}}</span>
+          <input id="fileContentSource" class="fm-file-input" type="file"
+                 formControlName="fileContentControl"
+                 (change)="onFileContentSourceChange($event)"
+                 (focus)="setFocusOnFileSelector(true)" (blur)="setFocusOnFileSelector(false)"/>
+          <div class="fm-drop" [class.fm-drop--empty]="!selectedFileContentSource"
+               [class.fm-drop--invalid]="techTypeMismatch || showFileSelectorMandatoryMessage()">
+            <ng-container *ngIf="!selectedFileContentSource">
+              <fileman-icon name="upload"></fileman-icon>
+              <span>No file chosen yet</span>
+              <label for="fileContentSource" class="fm-btn">Choose file</label>
+            </ng-container>
+            <ng-container *ngIf="selectedFileContentSource">
+              <span class="fm-badge">{{getSelectedFileType()}}</span>
+              <span class="fm-drop__file">
+                <span class="fm-strong">{{selectedFileContentSource.name}}</span>
+                <span class="fm-help">{{getSelectedFileSize()}}</span>
+              </span>
+              <label for="fileContentSource" class="fm-btn">Choose another</label>
+            </ng-container>
+          </div>
+          <span class="fm-help" *ngIf="newFileMode">The name is taken from the file unless you enter one.</span>
+          <span class="fm-help" *ngIf="!newFileMode">Optional. Without new content no new version is created. The type must stay .{{toEdit?.techType}}.</span>
+        </div>
+
+        <!-- The table section below is generated: Do not modify manually! -->
+        <div class="fm-form-grid" formGroupName="detailsForm">
+            <div class="fm-field">
+                <label class="fm-label" for="name">Name</label>
+                <input id="name" type="text" class="fm-input" formControlName="nameControl"/>
+            </div>
+            <div class="fm-field">
+                <label class="fm-label" for="description">Description</label>
+                <textarea id="description" class="fm-textarea" rows="3" formControlName="descriptionControl"></textarea>
+            </div>
+            <div class="fm-field" *ngIf="!newFileMode">
+                <label class="fm-checkfield" for="immediatelyActive">
+                    <input id="immediatelyActive" type="checkbox" class="fm-checkbox" formControlName="immediatelyActiveControl"/>
+                    <span class="fm-label">Make new content active right away</span>
+                </label>
+            </div>
+            <div class="fm-field">
+                <label class="fm-label" for="fileGroups">File groups</label>
+                <ng-multiselect-dropdown
+                  id="fileGroups"
+                  formControlName="fileGroupsControl"
+                  [placeholder]="'Choose…'"
+                  [data]="fileGroups"
+                  (onSelect)="fileGroupsC.markAsTouched()"
+                  (onSelectAll)="fileGroupsC.markAsTouched()"
+                  (onDeSelect)="fileGroupsC.markAsTouched()"
+                  (onDeSelectAll)="fileGroupsC.markAsTouched()"
+                  [settings]="fileGroupsMultiselectDropdownSettings">
+                </ng-multiselect-dropdown>
+            </div>
+        </div>
+        <!-- The table section above is generated: Do not modify manually! -->
+
+      </div>
+
+      <div class="fm-form-card__actions">
+        <span class="fm-form-card__note" *ngIf="!newFileMode && toEdit">Created {{formatDate(toEdit.creationDate)}} by {{toEdit.creator}}</span>
+        <button type="button" class="fm-btn" (click)="cancel()">Cancel</button>
+        <button *ngIf="!readOnly" type="submit" class="fm-btn fm-btn--primary"
                 [disabled]="(!fileContentC.touched && !detailsForm.touched)
                     || detailsForm.invalid || fileContentC.invalid
                     || (newFileMode && fileContentC.value.length == 0)"
-                class="button btn btn-primary"
-                type="submit"
-                data-toggle="tooltip" title="{{getToolTip()}}"
-        >Save</button>
-        &nbsp;
-        <button type="button" class="btn btn-primary" (click)="cancel()">Cancel</button>
-    </div>
-</form>
+                [title]="getToolTip()">{{newFileMode ? 'Create file' : 'Save changes'}}</button>
+      </div>
+    </form>
+  </main>
+</div>

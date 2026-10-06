@@ -1,70 +1,71 @@
-<table>
-    <tr style="font-weight:bold; background-color:darkgray;">
-        <td></td>
-        <td></td>
-
+<div class="fm-table-wrap">
+  <table class="fm-table">
+    <thead>
+      <tr>
         <!-- The header-td-sections below is generated: Do not modify manually! -->
-
-        <td>
+        <th>
             Id
             <fileman-sorticon [sortField]="'id'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             Name
             <fileman-sorticon [sortField]="'name'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             Role
             <fileman-sorticon [sortField]="'role'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             Tenants
             <fileman-sorticon [sortField]="'tenants'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             Avatar
             <fileman-sorticon [sortField]="'avatar'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-
+        </th>
         <!-- The header-td-sections above is generated: Do not modify manually! -->
 
+        <th><span class="fm-sr">Actions</span></th>
       </tr>
-      <tr *ngFor="let user of viewedUsers; let i = index">
-        <td>{{i+1}}.</td>
-        <td>
-          <mat-icon data-toggle="tooltip" title="Open Action Menu" (click)="pullDown.open()">more_vert</mat-icon>
-          <mat-form-field class="hidden-form-field">
-            <mat-select
-              #pullDown
-              (opened)="onPullDownOpened(pullDown)"
-              filemanOutsideClickListener
-              (clickedOutside)="closeOpenPullDowns()">
-              <mat-option *ngIf="!readOnly" (click)="edit(user)">
-                <mat-icon>edit</mat-icon>Edit
-              </mat-option>
-              <mat-option *ngIf="!readOnly" (click)="delete(user)">
-                <mat-icon>delete</mat-icon>Delete
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </td>
-
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of viewedUsers; let i = index" [class.fm-row--menu-open]="isMenuOpen(i)">
         <!-- The row-td-sections below is generated: Do not modify manually! -->
-
         <td>{{user.id}}</td>
-        <td>{{user.name}}</td>
-        <td>{{user.role}}</td>
+        <td class="fm-strong">{{user.name}}</td>
+        <td><span class="fm-role" [ngClass]="'fm-role--' + (user.role || '').toLowerCase()">{{user.role}}</span></td>
         <td>{{formatTenants(user.tenants)}}</td>
-
         <!-- The row-td-sections above is generated: Do not modify manually! -->
         <td>
-          <img class="image-preview" *ngIf="hasAvatar(user.name)" [src]="getAvatar(user.name)">
-          <div class="default-avatar" *ngIf="!hasAvatar(user.name)"
-                 [ngStyle]="{'background-color': getAvatarBackgroundColor(user.name),
-                             'color': getAvatarTextColor(user.name)}">
-              <span class="avatar-text-content">{{getUserInitials(user.name)}}</span>
-          </div>
+          <span class="fm-row__lead fm-row__lead--avatar" aria-hidden="true">
+      <img *ngIf="hasAvatar(user.name)" [src]="getAvatar(user.name)" alt="">
+      <span *ngIf="!hasAvatar(user.name)">{{getInitials(user.name)}}</span>
+    </span>
         </td>
 
+        <td class="fm-actions">
+          <span *ngIf="!readOnly" class="fm-row__actions">
+        <button type="button" class="fm-icon-btn" data-option="edit" aria-label="Edit user" title="Edit user" (click)="edit(user)">
+          <fileman-icon name="edit"></fileman-icon>
+        </button>
+        <span class="fm-menu-anchor" filemanOutsideClickListener (clickedOutside)="closeMenu(i)" (keydown.escape)="closeMenu(i)">
+          <button type="button" class="fm-icon-btn" aria-haspopup="menu" [attr.aria-expanded]="isMenuOpen(i)"
+                  aria-label="More actions" title="More actions" (click)="toggleMenu(i, $event)">
+            <fileman-icon name="more"></fileman-icon>
+          </button>
+          <div class="fm-menu fm-menu--floating" role="menu" [hidden]="!isMenuOpen(i)" [ngStyle]="menuStyle">
+            <button type="button" class="fm-menu__item" role="menuitem" data-option="edit-menu" (click)="closeMenu(); edit(user)">
+              <fileman-icon name="edit" [size]="18"></fileman-icon>Edit
+            </button>
+            <span class="fm-menu__sep" role="separator"></span>
+            <button type="button" class="fm-menu__item fm-menu__item--danger" role="menuitem" data-option="delete" (click)="closeMenu(); delete(user)">
+              <fileman-icon name="trash" [size]="18"></fileman-icon>Delete…
+            </button>
+          </div>
+        </span>
+      </span>
+        </td>
       </tr>
-</table>
+    </tbody>
+  </table>
+</div>

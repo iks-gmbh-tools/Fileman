@@ -1,18 +1,7 @@
-button:disabled {
-    background: gray;
-    border: 1px solid black;
-}
-
-table, th , td {
-  border: 1px solid grey;
-  border-collapse: collapse;
-  padding: 5px;
-}
-
-table tr:nth-child(odd) {
-  background-color: #f1f1f1;
-}
-
-table tr:nth-child(even) {
-  background-color: #ffffff;
-}
+/* Version history page (design system: DetailPanel history, FormCard). Shared styles: src/styles/fileman.css */
+:host { display: block; }
+.fm-heading { display: flex; flex-direction: column; gap: 4px; }
+.fm-history { margin: 0; padding: 0; border: 0; }
+.fm-history legend { margin-bottom: 8px; }
+.fm-strong { font-weight: 600; }
+.fm-mono { display: block; font-size: 12px; }

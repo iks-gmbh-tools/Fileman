@@ -160,6 +160,7 @@ class <<DomainPath>>.FileMetaData
   attribute "immediately Active"
     metainfo JavaType Boolean
     metainfo guiType Checkbox
+    metainfo guiLabel "Make new content active right away"   # Fileman redesign: label in the generated forms
     metainfo guiCondition !newFileMode
     metainfo defaultValue true
     metainfo ExampleData true
@@ -169,6 +170,7 @@ class <<DomainPath>>.FileMetaData
     metainfo dbType int
     metainfo JavaType java.util.List<FileGroup>
     metainfo guiType MultiSelectBox
+    metainfo guiLabel "File groups"   # Fileman redesign: label in the generated forms
     metainfo dbRelation ManyToMany
     metainfo breakRecursionOnAttribute files
     metainfo joinTable fileMetaData_fileGroup
@@ -318,12 +320,14 @@ class <<DomainPath>>.User
     metainfo hideFromClientOverview true
     metainfo hideFromDB true
     metainfo guiType PasswordField
+    metainfo guiLabel "Repeat password"   # Fileman redesign: label in the generated forms
 
    attribute avatar
     metainfo dbType clob # clob (instead of blob) as we are using the String
                          # format on client side to determine the file type
     metainfo JavaType String
     metainfo guiType FileSelector
+    metainfo guiLabel "Avatar"   # Fileman redesign: label in the generated forms
 
 class <<DomainPath>>.Tenant
   metainfo implements java.io.Serializable

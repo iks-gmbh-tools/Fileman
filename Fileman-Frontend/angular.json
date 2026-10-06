@@ -24,8 +24,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css",
-              "../Fileman-Frontend/node_modules/material-design-icons/iconfont/material-icons.css"
+              "src/styles.css"
             ],
             "scripts": [
               "node_modules/mammoth/mammoth.browser.min.js"

@@ -1,2 +1,14 @@
-<fileman-logo></fileman-logo> Error Page
-<p>{{getMessage()}}</p>
+<div class="fm-page">
+  <header class="fm-header"><fileman-logo></fileman-logo></header>
+  <main class="fm-error-page">
+    <div class="fm-error-page__inner">
+      <span class="fm-error-page__code">{{getCode()}}</span>
+      <h1 class="fm-title">{{getTitle()}}</h1>
+      <p class="fm-muted">{{getMessage()}}</p>
+      <div class="fm-error-page__actions">
+        <a routerLink="/fileman/overview" class="fm-btn fm-btn--primary">Go to files</a>
+        <a href="" class="fm-btn" (click)="$event.preventDefault(); goBack()">Go back</a>
+      </div>
+    </div>
+  </main>
+</div>

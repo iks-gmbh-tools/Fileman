@@ -27,6 +27,8 @@ import { TenantService } from 'src/app/services/fileman-tenant-service.service';
 import { FilemanAvatarService } from 'src/app/services/fileman-avatar-service.service';
 import { Utils } from 'src/app/common/Utils';
 import { MultiselectDropdownSettings } from 'src/app/common/fileman-constants';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 
 @Component({
   selector: 'fileman-user-details',
@@ -53,7 +55,9 @@ export class UserDetailsComponent implements OnInit {
               private authService: FilemanAuthserviceService,
               private userService: UserService,
               private tenantService: TenantService,
-              private avatarService: FilemanAvatarService) {
+              private avatarService: FilemanAvatarService,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) {
       this.form = this.createFormGroup();
       this.reader = new FileReader();
       this.currentlyLoggedInUser = authService.getCurrentUserName();
@@ -68,7 +72,7 @@ export class UserDetailsComponent implements OnInit {
       this.userService.getUser(id).subscribe(user => {
         this.toEdit = new User(user);
         if (this.toEdit == null) {
-          alert('No data available for user "' + id + '"!');
+          this.dialogService.alert('User not available', 'No data is loaded for this user. Open it again from the user overview.');
           this.backToOverview();  // no data to edit available - happens for page reload - reason unclear
         } else {
           this.setDataToControls(this.toEdit);
@@ -130,22 +134,22 @@ export class UserDetailsComponent implements OnInit {
                   this.passwordRepetitionC.value.trim() : null,
       avatar: this.avatarFileContent
     });
-    console.log('Saving ');
-    console.log(toSave);
 
     if (this.newMode) {
       this.userService.create(toSave)
           .subscribe(() => {
             this.avatarService.prepareAvatar(toSave.getName(), toSave.getAvatar());
+            this.toastService.success('Created user ' + toSave.getName() + '.');
           }, error => {
-            alert('Error saving new user with name "' + toSave.getName() + '"!');
+            this.toastService.error('Creating user ' + toSave.getName() + ' failed. Try again.');
           });
     } else {
       this.userService.update(toSave)
           .subscribe(() => {
             this.avatarService.prepareAvatar(toSave.getName(), toSave.getAvatar());
+            this.toastService.success('Saved user ' + toSave.getName() + '.');
           }, error => {
-            alert('Error updating user with ID "' + toSave.getId() + '"!');
+            this.toastService.error('Saving user ' + toSave.getName() + ' failed. Try again.');
           });
     }
 
@@ -250,6 +254,16 @@ export class UserDetailsComponent implements OnInit {
 
   getAvatar(): string {
     return this.avatarService.getAvatarData(this.nameC.value.trim());
+  }
+
+  getInitials(): string {
+    const name: string = this.nameC.value || '';
+    return name.split(/[\s._-]+/)
+               .filter(part => part.length > 0)
+               .map(part => part[0])
+               .join('')
+               .substr(0, 2)
+               .toUpperCase();
   }
 
   clearAvatar() {

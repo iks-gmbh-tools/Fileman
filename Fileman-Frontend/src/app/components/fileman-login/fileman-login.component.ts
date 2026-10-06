@@ -29,6 +29,9 @@ import { FilemanSearchService } from 'src/app/services/fileman-search-service.se
   styleUrls: ['./fileman-login.component.css']
 })
 export class FilemanLoginComponent {
+
+  readonly version = FilemanConstants.VERSION;
+  showPassword = false;
   errorMessage: string;
 
   constructor(private router: Router,
@@ -36,6 +39,11 @@ export class FilemanLoginComponent {
               private authService: FilemanAuthserviceService,
               private userPreferencesService: FilemanUserPreferencesService,
               private searchService: FilemanSearchService) { }
+
+  /** shows the field errors when the form is submitted incomplete */
+  markAllAsTouched(formControl) {
+    Object.keys(formControl.controls).forEach(key => formControl.controls[key].markAsTouched());
+  }
 
   onLogin(formControl) {
     const requestData = new LoginRequest(formControl.value);

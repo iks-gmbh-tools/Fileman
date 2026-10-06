@@ -1,119 +1,65 @@
-<mat-toolbar>
+<header class="fm-header">
+  <fileman-logo></fileman-logo>
 
-    <fileman-logo></fileman-logo>
+  <nav class="fm-tabs" aria-label="Content" *ngIf="isAdmin">
+    <a *ngFor="let tab of contentTabs" class="fm-tab" href=""
+       [attr.aria-current]="userPreferences.contentType === tab.type ? 'page' : null"
+       (click)="$event.preventDefault(); onContentTypeChange(tab.type)">{{tab.label}}</a>
+  </nav>
 
-    <span class="separator">|</span>
+  <span class="fm-spacer"></span>
 
-    <mat-icon data-toggle="tooltip" title="{{getAddNewToolTip()}}"
-          (click)="onNewClick()"
-          [ngStyle]="{
-          'color': readOnly ? 'azure' : 'lightgoldenrodyellow',
-          'backgroundColor': readOnly ? 'lightgray' : 'blue'}"
-          style="margin-left: 2px;"
-          >{{iconNew}}</mat-icon>
-
-    <mat-icon data-toggle="tooltip" title="Reload from server"
-              (click)="onReloadClick()"
-              style="margin-left: 5px; margin-right: 2px;"
-              >{{iconReload}}</mat-icon>
-
-    <span class="separator">|</span>
-
-    Layout:
-    <mat-icon data-toggle="tooltip" title="Change to List Layout"
-              (click)="onLayoutClick(layoutTypeList)"
-              [ngStyle]="{
-              'color': userPreferences.layoutType === layoutTypeList ? '#777777' : 'lightgoldenrodyellow',
-              'backgroundColor': userPreferences.layoutType === layoutTypeList ? 'lightgray' : 'blue'}"
-              style="margin-left: 10px;"
-              >{{iconList}}</mat-icon>
-    <mat-icon data-toggle="tooltip" title="Change to Table Layout"
-              (click)="onLayoutClick(layoutTypeTable)"
-              disabled="layoutType.equals(layoutTypeTable)"
-              [ngStyle]="{
-              'color': userPreferences.layoutType === layoutTypeTable ? '#777777' : 'lightgoldenrodyellow',
-              'backgroundColor': userPreferences.layoutType === layoutTypeTable ? 'lightgray' : 'blue'}"
-              style="margin-left: 5px;"
-              >{{iconTable}}</mat-icon>
-    <mat-icon data-toggle="tooltip" title="Change to Tiles Layout"
-              (click)="onLayoutClick(layoutTypeTiles)"
-              disabled="layoutType.equals(layoutTypeTiles)"
-              [ngStyle]="{
-              'color': userPreferences.layoutType === layoutTypeTiles ? '#777777' : 'lightgoldenrodyellow',
-              'backgroundColor': userPreferences.layoutType === layoutTypeTiles ? 'lightgray' : 'blue'}"
-              style="margin-left: 5px; margin-right: 2px;"
-              >{{iconTiles}}</mat-icon>
-
-    <span class="separator">|</span>
-
-    Search:
-    <input type="text" #searchString
+  <label class="fm-search" *ngIf="showPageToolbar">
+    <fileman-icon name="search" [size]="18"></fileman-icon>
+    <span class="fm-sr">Search {{getContentLabel()}}</span>
+    <input #searchString type="search"
            [ngModel]="getSearchString()"
            (keyup)="startSearch(searchString.value)"
-           [ngStyle]="{'max-width.px': 200}"
-           style="background: lavender; margin-left: 10px;">
+           (search)="startSearch(searchString.value)"
+           placeholder="Search {{getContentLabel()}}">
+  </label>
 
-    <mat-icon *ngIf="showFavouriteIcon"
-              data-toggle="tooltip"
-              title="Favourite Filter"
-              (click)="onFavouriteFilterClick()"
-              [ngStyle]="{
-              'color': 'blue',
-              'backgroundColor': 'lavender'}"
-              style="margin-left: 10px;"
-              >{{favouriteFilterIcon}}</mat-icon>
+  <div class="fm-user">
+    <button *ngIf="isAdmin" type="button" class="fm-icon-btn" id="toolbar-database"
+            aria-label="Open database console" title="Open database console" (click)="openDbLink()">
+      <fileman-icon [name]="iconDatabase"></fileman-icon>
+    </button>
+    <span class="fm-avatar" aria-hidden="true">{{getUserInitials()}}</span>
+    <span>{{currentUserName}}</span>
+    <button type="button" class="fm-icon-btn" id="toolbar-logout" aria-label="Log out" title="Log out" (click)="onLogout()">
+      <fileman-icon [name]="iconLogout"></fileman-icon>
+    </button>
+  </div>
+</header>
 
-    <span *ngIf="isAdmin" class="separator" style="margin-left: 12px;">|</span>
-    <span *ngIf="isAdmin">Display:</span>
-    <select *ngIf="isAdmin"
-      id="contentTypeSelect"
-      #contentTypeSelect
-      style="background: lightyellow; margin-left: 10px;"
-      (change)="onContentTypeChange(contentTypeSelect.value)">
-        <option
-          [value]="contentTypeFiles"
-          [selected]="userPreferences.contentType === contentTypeFiles">Files</option>
-        <option
-          [value]="contentTypeUsers"
-          [selected]="userPreferences.contentType === contentTypeUsers">Users</option>
-        <option
-          [value]="contentTypeTenants"
-          [selected]="userPreferences.contentType === contentTypeTenants">Tenants</option>
-        <option
-          [value]="contentTypeFileGroups"
-          [selected]="userPreferences.contentType === contentTypeFileGroups">File Groups</option>
-    </select>
-    &nbsp;
-    <mat-icon *ngIf="isAdmin"
-              data-toggle="tooltip"
-              title="Login to Database"
-              style="color: gray; background: lightyellow; margin-left: 5px;"
-              (click)="openDbLink()"
-              >{{iconDatabase}}</mat-icon>
+<div class="fm-main fm-main--head" *ngIf="showPageToolbar">
+  <div class="fm-toolbar">
+    <h1 class="fm-title">{{getTitle()}}</h1>
+    <span class="fm-spacer"></span>
 
-    <span class="spacer"></span>
+    <label class="fm-check" *ngIf="showFavouriteIcon">
+      <input type="checkbox" id="toolbar-favourite-filter"
+             [checked]="userPreferences.favouriteFilterActive"
+             (change)="onFavouriteFilterClick()">
+      Favourites only
+    </label>
 
-    <mat-icon data-toggle="tooltip" title="Logout"
-            (click)="onLogout()"
-            style="margin-left: 10px;"
-            >{{iconLogout}}</mat-icon>
+    <button type="button" class="fm-icon-btn" id="toolbar-reload"
+            aria-label="Reload from server" title="Reload from server" (click)="onReloadClick()">
+      <fileman-icon [name]="iconReload"></fileman-icon>
+    </button>
 
-    <span style="margin-left: 5px;">
-      <ng-content select=".username"></ng-content>
-    </span>
-
-</mat-toolbar>
-
-<!--
-    <div class="md-form">
-        <mdb-icon fas icon="envelope" class="prefix"></mdb-icon>
-        <input mdbInput type="text" id="form2" class="form-control">
-        <label for="form2">Example label</label>
+    <div class="fm-seg" role="group" aria-label="Layout">
+      <button type="button" id="toolbar-layout-list" [attr.aria-pressed]="userPreferences.layoutType === layoutTypeList"
+              (click)="onLayoutClick(layoutTypeList)">List</button>
+      <button type="button" id="toolbar-layout-table" [attr.aria-pressed]="userPreferences.layoutType === layoutTypeTable"
+              (click)="onLayoutClick(layoutTypeTable)">Table</button>
+      <button type="button" id="toolbar-layout-tiles" [attr.aria-pressed]="userPreferences.layoutType === layoutTypeTiles"
+              (click)="onLayoutClick(layoutTypeTiles)">Tiles</button>
     </div>
--->
 
-<!--
-    icons:
-    settings-application
-    delete
--->
+    <button *ngIf="!readOnly" type="button" class="fm-btn fm-btn--primary" id="toolbar-new" (click)="onNewClick()">
+      <fileman-icon [name]="iconNew" [size]="18"></fileman-icon>{{getNewLabel()}}
+    </button>
+  </div>
+</div>

@@ -1,46 +1,7 @@
-table, th, td {
-  border: 1px solid grey;
-  border-collapse: collapse;
-  padding: 5px;
-}
-
-table tr:nth-child(odd) {
-  background-color: #f1f1f1;
-}
-
-table tr:nth-child(even) {
-  background-color: #ffffff;
-}
-
-.mat-icon {
-  color: blue;
-  background: lightgoldenrodyellow;
-  cursor: pointer;
-}
-
-.hidden-form-field {
-  visibility: hidden;
-  height: 0px;
-  width: 0px;
-}
-
-fileman-sorticon {
-  vertical-align: middle;
-  display: inline-block;
-}
-
-::ng-deep div.mat-select-arrow-wrapper {
-  display: none;
-}
-
-::ng-deep .cdk-overlay-pane {
-  position: relative;
-  pointer-events: auto;
-  box-sizing: border-box;
-  z-index: 1000;
-  display: flex;
-  max-width: 220px;
-  max-height: 100%;
-  transform: none !important;
-  background-color: lightyellow
-}
+/* Table layout (design system: FileTable). Shared styles: src/styles/fileman.css */
+:host { display: block; }
+.fm-table { min-width: 1100px; }
+.fm-col-fav { width: 44px; padding-left: 12px !important; padding-right: 0 !important; }
+.fm-strong { font-weight: 600; }
+.fm-row--menu-open { background: var(--selected-row); }
+th { white-space: nowrap; }

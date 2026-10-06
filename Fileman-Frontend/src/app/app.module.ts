@@ -44,6 +44,9 @@ import { WriterAuthGuard } from './services/guard/writer-auth-guard.service';
 import { AdminAuthGuard } from './services/guard/admin-auth-guard.service';
 
 import { FilemanLogoComponent } from './components/fileman-logo.component';
+import { FilemanIconComponent } from './components/ui/fileman-icon.component';
+import { FilemanDialogHostComponent } from './components/ui/fileman-dialog-host.component';
+import { FilemanToastHostComponent } from './components/ui/fileman-toast-host.component';
 import { FilemanLoginComponent } from './components/fileman-login/fileman-login.component';
 import { FilemanOverviewComponent } from './components/fileman-overview/fileman-overview.component';
 import { FilemanFileOverviewComponent } from './components/fileman-overview/files/fileman-file-overview.component';
@@ -57,7 +60,7 @@ import { FilemanErrorHandler } from './common/fileman-error-handler';
 import { FilemanProblemPageComponent } from './components/fileman-problem-page/fileman-page-not-found.component';
 import { FilemanHistoryViewComponent } from './components/fileman-history-view/fileman-history-view.component';
 import { FilemanTooltipOptions } from './common/fileman-constants';
-import { FilemetadataDetailsComponent } from './components/details/fileman-filemetadata-details/fileman-filemetadata-details.component';
+import { FilemetadataDetailsComponent } from './components/details/fileman-filemetadata-details/fileman-fileMetaData-details.component';
 import { UserDetailsComponent } from './components/details/fileman-user-details/fileman-user-details.component';
 import { FilemetadataListLayout } from './components/layout/filemetadata/list-layout/fileman-filemetadata-list-layout-component';
 import { FilemetadataTableLayout } from './components/layout/filemetadata/table-layout/fileman-filemetadata-table-layout-component';
@@ -74,11 +77,11 @@ import { TenantTableLayout } from './components/layout/tenant/table-layout/filem
 import { TenantTilesLayout } from './components/layout/tenant/tiles-layout/fileman-tenant-tiles-layout-component';
 import { TenantService } from './services/fileman-tenant-service.service';
 
-import { FileGroupDetailsComponent } from './components/details/fileman-filegroup-details/fileman-filegroup-details.component';
-import { FilemanFileGroupOverviewComponent } from './components/fileman-overview/fileGroups/fileman-fileGroup-overview.component';
-import { FileGroupListLayout } from './components/layout/fileGroup/list-layout/fileman-fileGroup-list-layout-component';
-import { FileGroupTableLayout } from './components/layout/fileGroup/table-layout/fileman-fileGroup-table-layout-component';
-import { FileGroupTilesLayout } from './components/layout/fileGroup/tiles-layout/fileman-fileGroup-tiles-layout-component';
+import { FileGroupDetailsComponent } from './components/details/fileman-fileGroup-details/fileman-fileGroup-details.component';
+import { FilemanFileGroupOverviewComponent } from './components/fileman-overview/filegroups/fileman-filegroup-overview.component';
+import { FileGroupListLayout } from './components/layout/filegroup/list-layout/fileman-filegroup-list-layout-component';
+import { FileGroupTableLayout } from './components/layout/filegroup/table-layout/fileman-filegroup-table-layout-component';
+import { FileGroupTilesLayout } from './components/layout/filegroup/tiles-layout/fileman-filegroup-tiles-layout-component';
 import { FileGroupService } from './services/fileman-filegroup-service.service';
 
 @NgModule({
@@ -97,6 +100,7 @@ import { FileGroupService } from './services/fileman-filegroup-service.service';
     FilemanProblemPageComponent,
     FilemanSortIconComponent,
     FilemanLogoComponent,
+    FilemanIconComponent, FilemanDialogHostComponent, FilemanToastHostComponent,
     FilemanHistoryViewComponent,
     UserListLayout, UserTableLayout, UserTilesLayout,
     TenantDetailsComponent,
@@ -131,7 +135,8 @@ import { FileGroupService } from './services/fileman-filegroup-service.service';
       {path: 'fileman/tenants/new', component: TenantDetailsComponent, canActivate: [AuthGuard, AdminAuthGuard]},
       {path: 'fileman/file-groups/new', component: FileGroupDetailsComponent, canActivate: [AuthGuard, AdminAuthGuard]},
       {path: 'fileman/problem', component: FilemanProblemPageComponent},
-      {path: 'fileman/**', component: FilemanProblemPageComponent}
+      {path: 'fileman/**', component: FilemanProblemPageComponent},
+      {path: '**', component: FilemanProblemPageComponent}   // 'fileman/**' alone never matches in Angular
     ])
   ],
   providers: [

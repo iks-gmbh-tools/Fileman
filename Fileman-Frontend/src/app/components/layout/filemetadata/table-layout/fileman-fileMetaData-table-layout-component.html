@@ -1,91 +1,73 @@
-<table>
-    <tr style="font-weight:bold; background-color:darkgray;">
-        <td></td>
-        <td></td>
+<div class="fm-table-wrap">
+  <table class="fm-table">
+    <thead>
+      <tr>
+        <th class="fm-col-fav"><span class="fm-sr">Favourite</span></th>
 
         <!-- The header-td-sections below is generated: Do not modify manually! -->
-
-        <td>
+        <th>
             Id
             <fileman-sorticon [sortField]="'id'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             Name
             <fileman-sorticon [sortField]="'name'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             Description
             <fileman-sorticon [sortField]="'description'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             ActiveUUID
             <fileman-sorticon [sortField]="'activeUUID'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             ImmediatelyActive
             <fileman-sorticon [sortField]="'immediatelyActive'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             FileGroups
             <fileman-sorticon [sortField]="'fileGroups'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             TechType
             <fileman-sorticon [sortField]="'techType'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             TechVersion
             <fileman-sorticon [sortField]="'techVersion'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             Creator
             <fileman-sorticon [sortField]="'creator'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             CreationDate
             <fileman-sorticon [sortField]="'creationDate'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-        <td>
+        </th>
+        <th>
             Size
             <fileman-sorticon [sortField]="'size'" (sortEventHandler)="sort($event)"></fileman-sorticon>
-        </td>
-
+        </th>
         <!-- The header-td-sections above is generated: Do not modify manually! -->
 
+        <th class="fm-col-actions"><span class="fm-sr">Actions</span></th>
       </tr>
-    <tr *ngFor="let file of viewedFiles; trackBy: trackFiles let i = index">
-        <td>{{i+1}}.</td>
-        <td>
-          <mat-icon data-toggle="tooltip" title="Open Action Menu" (click)="pullDown.open()">more_vert</mat-icon>
-          <mat-form-field class="hidden-form-field">
-            <mat-select
-              #pullDown
-              (opened)="onPullDownOpened(pullDown)"
-              filemanOutsideClickListener
-              (clickedOutside)="closeOpenPullDowns()">
-              <mat-option id="option-download" (click)="download(file)">
-                <mat-icon>{{iconDownload}}</mat-icon>Download
-              </mat-option>
-              <mat-option id="option-edit" *ngIf="!readOnly" (click)="edit(file)">
-                <mat-icon>{{iconEdit}}</mat-icon>Edit
-              </mat-option>
-              <mat-option id="option-delete" *ngIf="!readOnly" (click)="delete(file)">
-                <mat-icon>{{iconDelete}}</mat-icon>Delete
-              </mat-option>
-              <mat-option id="option-show-history" (click)="showHistory(file)">
-                <mat-icon>{{iconShowHistory}}</mat-icon>Show History
-              </mat-option>
-              <mat-option id="option-change-favourite" (click)="changeFavouriteSetting(file)">
-                <mat-icon>{{getFavouriteIcon(file)}}</mat-icon>{{getFavouriteButtonText(file.name)}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+    </thead>
+    <tbody>
+      <tr *ngFor="let file of viewedFiles; trackBy: trackFiles; let i = index" [class.fm-row--menu-open]="isMenuOpen(i)">
+        <td class="fm-col-fav">
+          <button type="button" class="fm-icon-btn fm-star" data-option="change-favourite"
+            [attr.aria-pressed]="isFileFavourite(file.name)"
+            [attr.aria-label]="getFavouriteTooltip(file)" [title]="getFavouriteTooltip(file)"
+            (click)="changeFavouriteSetting(file)">
+      <fileman-icon [name]="getFavouriteIcon(file)" [size]="18"></fileman-icon>
+    </button>
         </td>
 
         <!-- The row-td-sections below is generated: Do not modify manually! -->
-
         <td>{{file.id}}</td>
-        <td [ngStyle]="{'font-weight': isFileFavourite(file.name) ? 'bold' : ''}">{{file.name}} {{favouriteAsterix(file)}}</td>
+        <td class="fm-strong">{{file.name}}</td>
         <td>{{file.description}}</td>
         <td>{{file.activeUUID}}</td>
         <td>{{file.immediatelyActive}}</td>
@@ -94,10 +76,33 @@
         <td>{{file.techVersion}}</td>
         <td>{{file.creator}}</td>
         <td>&#8203;{{formatCreationDate(file.creationDate)}}</td>
-        <td>{{file.size}}</td>
-
+        <td class="fm-num">{{file.size}}</td>
         <!-- The row-td-sections above is generated: Do not modify manually! -->
 
+        <td class="fm-actions">
+          <button type="button" class="fm-icon-btn" data-option="download" aria-label="Download" title="Download" (click)="download(file)">
+        <fileman-icon name="download"></fileman-icon>
+      </button>
+      <button *ngIf="!readOnly" type="button" class="fm-icon-btn" data-option="edit" aria-label="Edit" title="Edit" (click)="edit(file)">
+        <fileman-icon name="edit"></fileman-icon>
+      </button>
+      <span class="fm-menu-anchor" filemanOutsideClickListener (clickedOutside)="closeMenu(i)" (keydown.escape)="closeMenu(i)">
+        <button type="button" class="fm-icon-btn" aria-haspopup="menu" [attr.aria-expanded]="isMenuOpen(i)"
+                aria-label="More actions" title="More actions" (click)="toggleMenu(i, $event)">
+          <fileman-icon name="more"></fileman-icon>
+        </button>
+        <div class="fm-menu fm-menu--floating" role="menu" [hidden]="!isMenuOpen(i)" [ngStyle]="menuStyle">
+          <button type="button" class="fm-menu__item" role="menuitem" data-option="show-history" (click)="closeMenu(); showHistory(file)">
+            <fileman-icon name="layers" [size]="18"></fileman-icon>Show history
+          </button>
+          <span *ngIf="!readOnly" class="fm-menu__sep" role="separator"></span>
+          <button *ngIf="!readOnly" type="button" class="fm-menu__item fm-menu__item--danger" role="menuitem" data-option="delete" (click)="closeMenu(); delete(file)">
+            <fileman-icon name="trash" [size]="18"></fileman-icon>Delete…
+          </button>
+        </div>
+      </span>
+        </td>
       </tr>
-</table>
-<b>* Favourite Files</b>
+    </tbody>
+  </table>
+</div>

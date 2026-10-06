@@ -21,6 +21,8 @@ import { Observable } from 'rxjs';
 import { <<Type>> } from 'src/app/common/domainobjects/gen/<<Type>>';
 import { FilemanAuthserviceService } from 'src/app/services/fileman-authservice.service';
 import { <<Type>>Service } from 'src/app/services/fileman-<<type>>-service.service';
+import { FilemanDialogService } from 'src/app/services/fileman-dialog.service';
+import { FilemanToastService } from 'src/app/services/fileman-toast.service';
 
 @Component({
   selector: 'fileman-<<type>>-details',
@@ -38,7 +40,9 @@ export class <<Type>>DetailsComponent implements OnInit {
 
   constructor(private router: Router,
               private authService: FilemanAuthserviceService,
-              private <<type>>Service: <<Type>>Service) {
+              private <<type>>Service: <<Type>>Service,
+              private dialogService: FilemanDialogService,
+              private toastService: FilemanToastService) {
       this.form = this.createFormGroup();
       this.currentlyLoggedInUser = authService.getCurrentUserName();
   }
@@ -52,7 +56,7 @@ export class <<Type>>DetailsComponent implements OnInit {
       this.<<type>>Service.get<<Type>>(id).subscribe(<<type>> => {
         this.toEdit = new <<Type>>(<<type>>);
         if (this.toEdit == null) {
-          alert('No data available for <<type>> "' + id + '"!');
+          this.dialogService.alert('<<Type>> not available', 'No data is loaded for this <<type>>. Open it again from the overview.');
           this.backToOverview();  // no data to edit available - happens for page reload - reason unclear
         } else {
           this.setDataToControls(this.toEdit);
@@ -71,18 +75,20 @@ export class <<Type>>DetailsComponent implements OnInit {
       id: this.toEdit != null ? this.toEdit.getId() : null,
       name: this.nameC.value.trim()
     });
-    console.log('Saving ');
-    console.log(toSave);
 
     if (this.newMode) {
       this.<<type>>Service.create(toSave)
-          .subscribe(() => {}, error => {
-            alert('Error saving new <<type>> with name "' + toSave.getName() + '"!');
+          .subscribe(() => {
+            this.toastService.success('Created <<type>> ' + toSave.getName() + '.');
+          }, error => {
+            this.toastService.error('Creating <<type>> ' + toSave.getName() + ' failed. Try again.');
           });
     } else {
       this.<<type>>Service.update(toSave)
-          .subscribe(() => {}, error => {
-            alert('Error updating <<type>> with ID "' + toSave.getId() + '"!');
+          .subscribe(() => {
+            this.toastService.success('Saved <<type>> ' + toSave.getName() + '.');
+          }, error => {
+            this.toastService.error('Saving <<type>> ' + toSave.getName() + ' failed. Try again.');
           });
     }
 

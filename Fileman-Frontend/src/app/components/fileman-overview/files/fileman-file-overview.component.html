@@ -1,125 +1,76 @@
-<hr style="background: blue">
+<div class="fm-overview">
 
-<div *ngIf="fileGroups.length > 0" class="file-group-box">
-  <p>File groups:</p>
-  <button type="button" [ngClass]="getButtonClassForNoGrouping()" (click)="onButtonPressForNoGrouping()">No grouping</button>
-  <span *ngFor="let fileGroup of fileGroups">
-      <button *ngIf="fileGroup.files.length > 0" type="button" [ngClass]="getButtonClassForFileGroup(fileGroup)" (click)="onButtonPressForFileGroup(fileGroup)">{{fileGroup.name}}</button>
-  </span>
-</div>
+  <div class="fm-filter" *ngIf="fileGroups.length > 0" role="group" aria-label="File groups">
+    <span class="fm-filter__label">Groups</span>
+    <button type="button" class="fm-chip" [attr.aria-pressed]="selectedFileGroups.length == 0"
+            (click)="onButtonPressForNoGrouping()">All files</button>
+    <ng-container *ngFor="let fileGroup of fileGroups">
+      <button *ngIf="fileGroup.files.length > 0" type="button" class="fm-chip"
+              [attr.aria-pressed]="isFileGroupSelected(fileGroup)"
+              (click)="onButtonPressForFileGroup(fileGroup)">{{fileGroup.name}}</button>
+    </ng-container>
+  </div>
 
-<h5>Hosted Files:</h5>
-<div *ngIf="allFilesMap.size == 0">
-    <i>None.</i>
-</div>
-<div *ngIf="viewedFiles.length == 0 && allFilesMap.size > 0">
-    <i>No file matches your filter.</i>
-</div>
+  <section class="fm-empty" *ngIf="allFilesMap.size == 0">
+    <span class="fm-empty__icon"><fileman-icon name="file" [size]="26"></fileman-icon></span>
+    <h2>No files yet</h2>
+    <p>Files you add here can be fetched by your systems over REST.<span *ngIf="readOnly"> A writer or admin can add them.</span></p>
+    <button *ngIf="!readOnly" type="button" class="fm-btn fm-btn--primary" (click)="createFile()">Add the first file</button>
+  </section>
 
-<div [ngSwitch]="userPreferences.layoutType">
-    <div *ngSwitchCase="layoutTypeList">
-        <fileman-filemetadata-list-layout
-          *ngIf="getValidNonEmptySelectedFileGroups().length == 0"
-          [viewedFiles]="viewedFiles"
-          [favouriteSettings]="favouriteSettings"
-          [readOnly]="readOnly"
-          (fileDownloaded)="download($event)"
-          (fileEdited)="edit($event)"
-          (fileDeleted)="delete($event)"
-          (fileHistoryShown)="showHistory($event)"
-          (fileFavouriteSettingChanged)="markFavourite($event)">
-        </fileman-filemetadata-list-layout>
-        <div *ngFor="let fileGroup of getValidNonEmptySelectedFileGroups(); let i = index">
-          <button
-            type="button"
-            class="btn button-group-display-tag">
-            {{fileGroup.name}}
-          </button>
-          <fileman-filemetadata-list-layout
-            [viewedFiles]="getViewedFilesForFileGroup(fileGroup)"
-            [favouriteSettings]="favouriteSettings"
-            [readOnly]="readOnly"
-            (fileDownloaded)="download($event)"
-            (fileEdited)="edit($event)"
-            (fileDeleted)="delete($event)"
-            (fileHistoryShown)="showHistory($event)"
-            (fileFavouriteSettingChanged)="markFavourite($event)">
-          </fileman-filemetadata-list-layout>
-          <div
-            *ngIf="i < getValidNonEmptySelectedFileGroups().length - 1"
-            style="margin-top: 40px;">
-            <hr style="background: blue; height: 0.5px">
-          </div>
-        </div>
+  <section class="fm-empty" *ngIf="viewedFiles.length == 0 && allFilesMap.size > 0">
+    <span class="fm-empty__icon"><fileman-icon name="search" [size]="26"></fileman-icon></span>
+    <h2>{{getNoMatchTitle()}}</h2>
+    <p>Check the spelling, or clear the search and filters.</p>
+    <div class="fm-empty__actions">
+      <button *ngIf="searchString" type="button" class="fm-btn" (click)="clearSearch()">Clear search</button>
+      <button *ngIf="userPreferences.favouriteFilterActive" type="button" class="fm-btn" (click)="clearFavouriteFilter()">Show all, not only favourites</button>
     </div>
-    <div *ngSwitchCase="layoutTypeTable">
-        <fileman-filemetadata-table-layout
-          *ngIf="getValidNonEmptySelectedFileGroups().length == 0"
-          [viewedFiles]="viewedFiles"
-          [favouriteSettings]="favouriteSettings"
-          [readOnly]="readOnly"
-          (fileDownloaded)="download($event)"
-          (fileEdited)="edit($event)"
-          (fileDeleted)="delete($event)"
-          (fileHistoryShown)="showHistory($event)"
-          (fileFavouriteSettingChanged)="markFavourite($event)">
-        </fileman-filemetadata-table-layout>
-        <div *ngFor="let fileGroup of getValidNonEmptySelectedFileGroups(); let i = index">
-          <button
-            type="button"
-            class="btn button-group-display-tag">
-            {{fileGroup.name}}
-          </button>
-          <fileman-filemetadata-table-layout
-            [viewedFiles]="getViewedFilesForFileGroup(fileGroup)"
-            [favouriteSettings]="favouriteSettings"
-            [readOnly]="readOnly"
-            (fileDownloaded)="download($event)"
-            (fileEdited)="edit($event)"
-            (fileDeleted)="delete($event)"
-            (fileHistoryShown)="showHistory($event)"
-            (fileFavouriteSettingChanged)="markFavourite($event)">
-          </fileman-filemetadata-table-layout>
-          <div
-            *ngIf="i < getValidNonEmptySelectedFileGroups().length - 1"
-            style="margin-top: 40px;">
-            <hr style="background: blue; height: 0.5px">
-          </div>
-        </div>
+  </section>
+
+  <ng-container *ngIf="viewedFiles.length > 0">
+    <ng-container *ngIf="getValidNonEmptySelectedFileGroups().length == 0">
+      <ng-container *ngTemplateOutlet="layout; context: {files: viewedFiles}"></ng-container>
+    </ng-container>
+
+    <section class="fm-group-section" *ngFor="let fileGroup of getValidNonEmptySelectedFileGroups()">
+      <h2 class="fm-section-tag">{{fileGroup.name}}</h2>
+      <ng-container *ngTemplateOutlet="layout; context: {files: getViewedFilesForFileGroup(fileGroup)}"></ng-container>
+    </section>
+  </ng-container>
+
+  <ng-template #layout let-files="files">
+    <div [ngSwitch]="userPreferences.layoutType">
+      <fileman-filemetadata-list-layout *ngSwitchCase="layoutTypeList"
+        [viewedFiles]="files"
+        [favouriteSettings]="favouriteSettings"
+        [readOnly]="readOnly"
+        (fileDownloaded)="download($event)"
+        (fileEdited)="edit($event)"
+        (fileDeleted)="delete($event)"
+        (fileHistoryShown)="showHistory($event)"
+        (fileFavouriteSettingChanged)="markFavourite($event)">
+      </fileman-filemetadata-list-layout>
+      <fileman-filemetadata-table-layout *ngSwitchCase="layoutTypeTable"
+        [viewedFiles]="files"
+        [favouriteSettings]="favouriteSettings"
+        [readOnly]="readOnly"
+        (fileDownloaded)="download($event)"
+        (fileEdited)="edit($event)"
+        (fileDeleted)="delete($event)"
+        (fileHistoryShown)="showHistory($event)"
+        (fileFavouriteSettingChanged)="markFavourite($event)">
+      </fileman-filemetadata-table-layout>
+      <fileman-filemetadata-tiles-layout *ngSwitchCase="layoutTypeTiles"
+        [viewedFiles]="files"
+        [favouriteSettings]="favouriteSettings"
+        [readOnly]="readOnly"
+        (fileDownloaded)="download($event)"
+        (fileEdited)="edit($event)"
+        (fileDeleted)="delete($event)"
+        (fileHistoryShown)="showHistory($event)"
+        (fileFavouriteSettingChanged)="markFavourite($event)">
+      </fileman-filemetadata-tiles-layout>
     </div>
-    <div *ngSwitchCase="layoutTypeTiles">
-        <fileman-filemetadata-tiles-layout
-          *ngIf="getValidNonEmptySelectedFileGroups().length == 0"
-          [viewedFiles]="viewedFiles"
-          [favouriteSettings]="favouriteSettings"
-          [readOnly]="readOnly"
-          (fileDownloaded)="download($event)"
-          (fileEdited)="edit($event)"
-          (fileDeleted)="delete($event)"
-          (fileHistoryShown)="showHistory($event)"
-          (fileFavouriteSettingChanged)="markFavourite($event)">
-        </fileman-filemetadata-tiles-layout>
-        <div *ngFor="let fileGroup of getValidNonEmptySelectedFileGroups(); let i = index">
-          <button
-            type="button"
-            class="btn button-group-display-tag">
-            {{fileGroup.name}}
-          </button>
-          <fileman-filemetadata-tiles-layout
-            [viewedFiles]="getViewedFilesForFileGroup(fileGroup)"
-            [favouriteSettings]="favouriteSettings"
-            [readOnly]="readOnly"
-            (fileDownloaded)="download($event)"
-            (fileEdited)="edit($event)"
-            (fileDeleted)="delete($event)"
-            (fileHistoryShown)="showHistory($event)"
-            (fileFavouriteSettingChanged)="markFavourite($event)">
-          </fileman-filemetadata-tiles-layout>
-          <div
-            *ngIf="i < getValidNonEmptySelectedFileGroups().length - 1"
-            style="margin-top: 40px;">
-            <hr style="background: blue; height: 0.5px">
-          </div>
-        </div>
-    </div>
+  </ng-template>
 </div>

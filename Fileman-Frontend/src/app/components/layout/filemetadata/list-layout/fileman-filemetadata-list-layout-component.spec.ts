@@ -21,6 +21,7 @@ import { DebugElement } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { FilemetadataListLayout } from './fileman-filemetadata-list-layout-component';
+import { FilemanIconComponent } from 'src/app/components/ui/fileman-icon.component';
 import { FileMetaData } from 'src/app/common/domainobjects/gen/FileMetaData';
 import { FavouriteSetting } from 'src/app/common/domainobjects/gen/FavouriteSetting';
 import { Icon } from 'src/app/common/fileman-constants';
@@ -33,7 +34,7 @@ describe('FilemanListLayout', () => {
   beforeEach(() => {
 
     TestBed.configureTestingModule({
-      declarations: [ FilemetadataListLayout ],
+      declarations: [ FilemetadataListLayout, FilemanIconComponent ],
       imports: [ RouterTestingModule, HttpClientModule ],
       providers: [{ provide: FilemanFileService, useClass: MockFilemanFileService }]
     });
@@ -58,51 +59,41 @@ describe('FilemanListLayout', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have all icons as non-read-only', () => {
+  it('should offer all actions to writers', () => {
     component.readOnly = false;
     component.favouriteSettings = new Map<string, FavouriteSetting>();
-
     const testFile: FileMetaData = new FileMetaData({name: 'test.txt', fileGroups: []});
     component.viewedFiles = [testFile];
-
     fixture.detectChanges();
 
-    const debugElements: DebugElement[] = fixture.debugElement.queryAll(By.css('mat-icon'));
-    const iconStrings: Array<string> = [];
-
-    for (let debugElement of debugElements) {
-      iconStrings.push(debugElement.nativeElement.innerText);
-    }
-
-    expect(iconStrings.length).toEqual(5);
-    expect(iconStrings).toContain(Icon.Download);
-    expect(iconStrings).toContain(Icon.Edit);
-    expect(iconStrings).toContain(Icon.Delete);
-    expect(iconStrings).toContain(Icon.ShowHistory);
-    expect(iconStrings).toContain(Icon.FavouriteFilterInactive);
+    expect(fixture.debugElement.query(By.css('[data-option="download"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="edit"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="delete"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="show-history"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="change-favourite"]'))).toBeTruthy();
   });
 
-  it('should have all icons but edit/delete as read-only', () => {
+  it('should hide edit and delete from readers', () => {
     component.readOnly = true;
     component.favouriteSettings = new Map<string, FavouriteSetting>();
-
     const testFile: FileMetaData = new FileMetaData({name: 'test.txt', fileGroups: []});
     component.viewedFiles = [testFile];
-
     fixture.detectChanges();
 
-    const debugElements: DebugElement[] = fixture.debugElement.queryAll(By.css('mat-icon'));
-    const iconStrings: Array<string> = [];
+    expect(fixture.debugElement.query(By.css('[data-option="download"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="edit"]'))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css('[data-option="delete"]'))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css('[data-option="show-history"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="change-favourite"]'))).toBeTruthy();
+  });
 
-    for (let debugElement of debugElements) {
-      iconStrings.push(debugElement.nativeElement.innerText);
-    }
+  it('should show the favourite star as unset for a file that is no favourite', () => {
+    component.readOnly = false;
+    component.favouriteSettings = new Map<string, FavouriteSetting>();
+    component.viewedFiles = [new FileMetaData({name: 'test.txt', fileGroups: []})];
+    fixture.detectChanges();
 
-    expect(iconStrings.length).toEqual(3);
-    expect(iconStrings).toContain(Icon.Download);
-    expect(iconStrings).not.toContain(Icon.Edit);
-    expect(iconStrings).not.toContain(Icon.Delete);
-    expect(iconStrings).toContain(Icon.ShowHistory);
-    expect(iconStrings).toContain(Icon.FavouriteFilterInactive);
+    const star = fixture.debugElement.query(By.css('[data-option="change-favourite"] fileman-icon'));
+    expect(star.nativeElement.getAttribute('data-icon')).toEqual(Icon.FavouriteFilterInactive);
   });
 });

@@ -1,80 +1,65 @@
-<form #formControl="ngForm" (ngSubmit)="onLogin(formControl)"
-      style="text-align: left">
+<div class="fm-login">
+  <section class="fm-login__brand" aria-label="About Fileman">
+    <div class="fm-login__brandline">
+      <span class="fm-login__mark">FileMan</span>
+      <span class="fm-login__version">v{{version}}</span>
+    </div>
+    <p class="fm-login__statement">Hosted files for your systems, managed in one place.</p>
+    <p class="fm-login__text">Properties, templates and images that your applications fetch over REST. Versioned, grouped and ready when they ask.</p>
+    <span class="fm-spacer"></span>
+    <div class="fm-login__tiles" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+  </section>
 
-    <table>
-        <td><img width="250" src="assets/images/Files.jpg" style></td>
+  <main class="fm-login__main">
+    <form class="fm-login__card" #formControl="ngForm" aria-labelledby="login-title" novalidate
+          (ngSubmit)="formControl.valid ? onLogin(formControl) : markAllAsTouched(formControl)">
+      <div class="fm-login__head">
+        <h1 id="login-title" class="fm-title">Log in</h1>
+        <span class="fm-count">Use your Fileman account.</span>
+      </div>
 
-        <td style="vertical-align: top; padding-right: 50px; padding-left: 50px">
-            <h2>
-                <fileman-logo></fileman-logo>
-                Login
-            </h2>
-            <div class="alert alert-danger" *ngIf="formControl.errors">
-                {{errorMessage}}
-            </div>
+      <div class="fm-alert" role="alert" *ngIf="formControl.errors">
+        <fileman-icon name="alert"></fileman-icon>
+        <span>{{errorMessage || 'User ID or password is wrong. Check both and try again.'}}</span>
+      </div>
 
-            <br>
+      <div class="fm-field">
+        <label class="fm-label" for="userId">User ID</label>
+        <input class="fm-input" id="userId" type="text" autocomplete="username"
+               required minlength="3" maxlength="32"
+               ngModel name="userId" #userIdControl="ngModel"
+               [attr.aria-invalid]="userIdControl.touched && !userIdControl.valid"
+               aria-describedby="userId-error">
+        <span class="fm-field-error" id="userId-error" *ngIf="userIdControl.touched && !userIdControl.valid">
+          <fileman-icon name="alert" [size]="16"></fileman-icon>
+          <ng-container *ngIf="userIdControl.errors?.required">Enter your user ID.</ng-container>
+          <ng-container *ngIf="userIdControl.errors?.minlength">Enter at least {{userIdControl.errors.minlength.requiredLength}} characters.</ng-container>
+        </span>
+      </div>
 
-            <table>
-                <tr class="form-group">
-                    <td>
-                        <label for="userId">User ID</label>
-                    </td>
-                    <td>
-                        <input required minlength="3" maxlength="32"
-                            ngModel name="userId" #userIdControl="ngModel"
-                            id="userId" type="text" class="form-Control"/>
-                    </td>
-                </tr>
+      <div class="fm-field">
+        <label class="fm-label" for="userPw">Password</label>
+        <div class="fm-pw">
+          <input id="userPw" [type]="showPassword ? 'text' : 'password'" autocomplete="current-password"
+                 ngModel name="userPw">
+          <button type="button" (click)="showPassword = !showPassword"
+                  [attr.aria-pressed]="showPassword">{{showPassword ? 'Hide' : 'Show'}}</button>
+        </div>
+      </div>
 
-                <tr>&nbsp;</tr>
+      <div class="fm-field">
+        <label class="fm-label" for="tenant">Tenant <span class="fm-label__opt">(optional)</span></label>
+        <input class="fm-input" id="tenant" type="text" placeholder="default" ngModel name="tenant"
+               aria-describedby="tenant-help">
+        <span class="fm-help" id="tenant-help">Leave empty to use the default tenant.</span>
+      </div>
 
-                <tr class="form-group">
-                    <td>
-                        <label for="userPw">Password&nbsp;&nbsp;</label>
-                    </td>
-                    <td>
-                        <input ngModel name="userPw" id="userPw" type="password" class="form-Control"/>
-                    </td>
-                </tr>
-
-                <tr>&nbsp;</tr>
-
-                <tr class="form-group">
-                  <td>
-                      <label for="tenant">Tenant</label>
-                  </td>
-                  <td>
-                      <input ngModel name="tenant" id="tenant" type="text" placeholder="default" class="form-Control"/>
-                  </td>
-              </tr>
-
-              <tr>&nbsp;</tr>
-
-            </table>
-
-            <div class="alert alert-danger"
-                *ngIf="userIdControl.touched && !userIdControl.valid">
-                <div *ngIf="userIdControl.errors.minlength">
-                    The {{userIdControl.name}} must exceed {{ userIdControl.errors.minlength.requiredLength}} characters.
-                </div>
-                <div *ngIf="userIdControl.errors.required">
-                    This field is required.
-                </div>
-            </div>
-
-            <button class="btn btn-primary"
-                    [disabled]="!formControl.valid"
-                    [ngStyle]="{
-                                'color': formControl.valid ? 'white' : 'black',
-                                'backgroundColor': formControl.valid ? 'blue' : 'gray'
-                            }"
-                    >Login</button>
-
-        </td>
-
-        <td><img width="250" src="assets/images/Files.jpg"></td>
-
-    </table>
-
-</form>
+      <button class="fm-btn fm-btn--primary" type="submit">Log in</button>
+    </form>
+    <span class="fm-login__footer">Fileman v{{version}} · IKS GmbH</span>
+  </main>
+</div>

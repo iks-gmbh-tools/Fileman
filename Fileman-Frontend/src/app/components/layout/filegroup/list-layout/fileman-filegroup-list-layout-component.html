@@ -1,17 +1,32 @@
-<li *ngFor="let fileGroup of viewedFileGroups; let i = index"
-    class="list-group-item">
-
-    <span *ngIf="! readOnly">
-        &nbsp;
-        <mat-icon data-toggle="tooltip" title="Edit" (click)="edit(fileGroup)">edit</mat-icon>
+<ul class="fm-list" aria-label="File groups">
+  <li class="fm-row" *ngFor="let fileGroup of viewedFileGroups; let i = index">
+    <span class="fm-row__lead" aria-hidden="true"><fileman-icon name="folder"></fileman-icon></span>
+    <span class="fm-row__text" style="flex: 0 1 220px" tooltip="{{getDetailsTooltip(fileGroup)}}">
+      <span class="fm-row__name">{{fileGroup.name}}</span>
+      <span class="fm-row__meta">{{getFileCountLabel(fileGroup)}}</span>
     </span>
-
-    <span *ngIf="! readOnly">
-        &nbsp;
-        <mat-icon *ngIf="! readOnly" data-toggle="tooltip" title="Delete" (click)="delete(fileGroup)">delete</mat-icon>
+    <span class="fm-pills">
+      <span class="fm-pill" *ngFor="let file of getFileList(fileGroup)">{{file.name}}</span>
     </span>
-
-    <span tooltip="{{getDetailsTooltip(fileGroup)}}">
-        {{i+1}}. {{fileGroup.name}}
-    </span>
-</li>
+    <span *ngIf="!readOnly" class="fm-row__actions">
+        <button type="button" class="fm-icon-btn" data-option="edit" aria-label="Edit file group" title="Edit file group" (click)="edit(fileGroup)">
+          <fileman-icon name="edit"></fileman-icon>
+        </button>
+        <span class="fm-menu-anchor" filemanOutsideClickListener (clickedOutside)="closeMenu(i)" (keydown.escape)="closeMenu(i)">
+          <button type="button" class="fm-icon-btn" aria-haspopup="menu" [attr.aria-expanded]="isMenuOpen(i)"
+                  aria-label="More actions" title="More actions" (click)="toggleMenu(i, $event)">
+            <fileman-icon name="more"></fileman-icon>
+          </button>
+          <div class="fm-menu fm-menu--floating" role="menu" [hidden]="!isMenuOpen(i)" [ngStyle]="menuStyle">
+            <button type="button" class="fm-menu__item" role="menuitem" data-option="edit-menu" (click)="closeMenu(); edit(fileGroup)">
+              <fileman-icon name="edit" [size]="18"></fileman-icon>Edit
+            </button>
+            <span class="fm-menu__sep" role="separator"></span>
+            <button type="button" class="fm-menu__item fm-menu__item--danger" role="menuitem" data-option="delete" (click)="closeMenu(); delete(fileGroup)">
+              <fileman-icon name="trash" [size]="18"></fileman-icon>Delete…
+            </button>
+          </div>
+        </span>
+      </span>
+  </li>
+</ul>

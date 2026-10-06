@@ -1,46 +1,16 @@
-table, th, td {
-  border: 1px solid grey;
-  border-collapse: collapse;
-  padding: 5px;
-}
-
-table tr:nth-child(odd) {
-  background-color: #f1f1f1;
-}
-
-table tr:nth-child(even) {
-  background-color: #ffffff;
-}
-
-.mat-icon {
-  color: blue;
-  background: lightgoldenrodyellow;
-  cursor: pointer;
-}
-
-.hidden-form-field {
-  visibility: hidden;
-  height: 0px;
-  width: 0px;
-}
-
-fileman-sorticon {
-  vertical-align: middle;
-  display: inline-block;
-}
-
-::ng-deep div.mat-select-arrow-wrapper {
-  display: none;
-}
-
-::ng-deep .cdk-overlay-pane {
-  position: relative;
-  pointer-events: auto;
-  box-sizing: border-box;
-  z-index: 1000;
-  display: flex;
-  max-width: 220px;
-  max-height: 100%;
-  transform: none !important;
-  background-color: lightyellow
-}
+/* File group table layout (design system: FileTable). Shared styles: src/styles/fileman.css */
+:host { display: block; }
+.fm-row__name { font-weight: 600; overflow-wrap: anywhere; }
+.fm-row__actions { display: inline-flex; align-items: center; margin-left: auto; }
+.fm-row__lead { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--radius-lg); background: var(--primary-tint); color: var(--primary); }
+.fm-row__lead--avatar { border-radius: var(--radius-full); overflow: hidden; font-weight: 700; font-size: 14px; }
+.fm-row__lead--avatar img { width: 100%; height: 100%; object-fit: cover; }
+.fm-pills { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 320px; min-width: 0; }
+.fm-strong { font-weight: 600; }
+.fm-row--menu-open { background: var(--selected-row); }
+th { white-space: nowrap; }
+.fm-tile__hero { display: flex; align-items: center; justify-content: center; height: 132px; background: var(--primary-tint); color: var(--primary); }
+.fm-tile__hero .fm-avatar { width: 88px; height: 88px; font-size: 30px; font-weight: 700; background: var(--surface); color: var(--primary); overflow: hidden; }
+.fm-tile__hero .fm-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.fm-tile__hero--folder { background: var(--tint-templates); color: var(--ink); }
+.fm-tile__body .fm-pills { margin-top: 6px; }

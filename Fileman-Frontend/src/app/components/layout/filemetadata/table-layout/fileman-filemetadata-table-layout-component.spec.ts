@@ -20,6 +20,8 @@ import { By } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 
 import { FilemetadataTableLayout } from './fileman-filemetadata-table-layout-component';
+import { FilemanIconComponent } from 'src/app/components/ui/fileman-icon.component';
+import { Icon } from 'src/app/common/fileman-constants';
 import { FileMetaData } from 'src/app/common/domainobjects/gen/FileMetaData';
 import { FavouriteSetting } from 'src/app/common/domainobjects/gen/FavouriteSetting';
 import { FilemanFileService } from 'src/app/services/fileman-file-service.service';
@@ -31,7 +33,7 @@ describe('FilemanTableLayout', () => {
   beforeEach(() => {
 
     TestBed.configureTestingModule({
-      declarations: [ FilemetadataTableLayout ],
+      declarations: [ FilemetadataTableLayout, FilemanIconComponent ],
       imports: [ RouterTestingModule, HttpClientModule ],
       providers: [{ provide: FilemanFileService, useClass: MockFilemanFileService }]
     });
@@ -56,35 +58,41 @@ describe('FilemanTableLayout', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have all options as non-read-only', () => {
+  it('should offer all actions to writers', () => {
     component.readOnly = false;
     component.favouriteSettings = new Map<string, FavouriteSetting>();
-
     const testFile: FileMetaData = new FileMetaData({name: 'test.txt', fileGroups: []});
     component.viewedFiles = [testFile];
-
     fixture.detectChanges();
 
-    expect(fixture.debugElement.query(By.css('#option-download'))).toBeTruthy();
-    expect(fixture.debugElement.query(By.css('#option-edit'))).toBeTruthy();
-    expect(fixture.debugElement.query(By.css('#option-delete'))).toBeTruthy();
-    expect(fixture.debugElement.query(By.css('#option-show-history'))).toBeTruthy();
-    expect(fixture.debugElement.query(By.css('#option-change-favourite'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="download"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="edit"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="delete"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="show-history"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="change-favourite"]'))).toBeTruthy();
   });
 
-  it('should have all options but edit/delete as read-only', () => {
+  it('should hide edit and delete from readers', () => {
     component.readOnly = true;
     component.favouriteSettings = new Map<string, FavouriteSetting>();
-
     const testFile: FileMetaData = new FileMetaData({name: 'test.txt', fileGroups: []});
     component.viewedFiles = [testFile];
-
     fixture.detectChanges();
 
-    expect(fixture.debugElement.query(By.css('#option-download'))).toBeTruthy();
-    expect(fixture.debugElement.query(By.css('#option-edit'))).toBeFalsy();
-    expect(fixture.debugElement.query(By.css('#option-delete'))).toBeFalsy();
-    expect(fixture.debugElement.query(By.css('#option-show-history'))).toBeTruthy();
-    expect(fixture.debugElement.query(By.css('#option-change-favourite'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="download"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="edit"]'))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css('[data-option="delete"]'))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css('[data-option="show-history"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-option="change-favourite"]'))).toBeTruthy();
+  });
+
+  it('should show the favourite star as unset for a file that is no favourite', () => {
+    component.readOnly = false;
+    component.favouriteSettings = new Map<string, FavouriteSetting>();
+    component.viewedFiles = [new FileMetaData({name: 'test.txt', fileGroups: []})];
+    fixture.detectChanges();
+
+    const star = fixture.debugElement.query(By.css('[data-option="change-favourite"] fileman-icon'));
+    expect(star.nativeElement.getAttribute('data-icon')).toEqual(Icon.FavouriteFilterInactive);
   });
 });

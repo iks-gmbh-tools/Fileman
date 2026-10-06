@@ -18,7 +18,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { FilemetadataDetailsComponent } from './fileman-filemetadata-details.component';
+import { FilemetadataDetailsComponent } from './fileman-fileMetaData-details.component';
 import { FilemanOverviewComponent } from '../../fileman-overview/fileman-overview.component';
 import { FilemanMetadataService } from 'src/app/services/fileman-metadata-service.service';
 import { FilemanFileService } from 'src/app/services/fileman-file-service.service';

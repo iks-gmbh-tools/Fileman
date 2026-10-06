@@ -23,7 +23,7 @@ import { Utils } from 'src/app/common/Utils';
 
 @Component({
   selector: 'fileman-filemetadata-table-layout',
-  templateUrl: './fileman-filemetadata-table-layout-component.html',
+  templateUrl: './fileman-fileMetaData-table-layout-component.html',
   styleUrls: ['./fileman-filemetadata-table-layout-component.css']
 })
 export class FilemetadataTableLayout extends LayoutFilemetadataCommons {

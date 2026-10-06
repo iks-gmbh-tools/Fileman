@@ -1,36 +1,38 @@
-<hr style="background: blue">
+<div class="fm-overview">
 
-<h5>Tenants:</h5>
-<div *ngIf="allTenantsMap.size == 0">
-    <i>None.</i>
-</div>
-<div *ngIf="viewedTenants.length == 0 && allTenantsMap.size > 0">
-    <i>No tenant matches your filter.</i>
-</div>
+  <section class="fm-empty" *ngIf="allTenantsMap.size == 0">
+    <span class="fm-empty__icon"><fileman-icon name="building" [size]="26"></fileman-icon></span>
+    <h2>No tenants yet</h2>
+    <p>Use “New tenant” above to add the first one.</p>
+  </section>
 
-<div [ngSwitch]="userPreferences.layoutType">
-    <div *ngSwitchCase="layoutTypeList">
-        <fileman-tenant-list-layout
-          [viewedTenants]="viewedTenants"
-          [readOnly]="readOnly"
-          (tenantEdited)="edit($event)"
-          (tenantDeleted)="delete($event)">
-        </fileman-tenant-list-layout>
+  <section class="fm-empty" *ngIf="viewedTenants.length == 0 && allTenantsMap.size > 0">
+    <span class="fm-empty__icon"><fileman-icon name="search" [size]="26"></fileman-icon></span>
+    <h2>No tenants match “{{searchString}}”</h2>
+    <p>Check the spelling, or clear the search.</p>
+    <div class="fm-empty__actions">
+      <button type="button" class="fm-btn" (click)="clearSearch()">Clear search</button>
     </div>
-    <div *ngSwitchCase="layoutTypeTable">
-      <fileman-tenant-table-layout
-        [viewedTenants]="viewedTenants"
-        [readOnly]="readOnly"
-        (tenantEdited)="edit($event)"
-        (tenantDeleted)="delete($event)">
-      </fileman-tenant-table-layout>
-    </div>
-    <div *ngSwitchCase="layoutTypeTiles">
-        <fileman-tenant-tiles-layout
-          [viewedTenants]="viewedTenants"
-          [readOnly]="readOnly"
-          (tenantEdited)="edit($event)"
-          (tenantDeleted)="delete($event)">
-        </fileman-tenant-tiles-layout>
-    </div>
+  </section>
+
+  <div *ngIf="viewedTenants.length > 0" [ngSwitch]="userPreferences.layoutType">
+    <fileman-tenant-list-layout *ngSwitchCase="layoutTypeList"
+      [viewedTenants]="viewedTenants"
+      [readOnly]="readOnly"
+      (tenantEdited)="edit($event)"
+      (tenantDeleted)="delete($event)">
+    </fileman-tenant-list-layout>
+    <fileman-tenant-table-layout *ngSwitchCase="layoutTypeTable"
+      [viewedTenants]="viewedTenants"
+      [readOnly]="readOnly"
+      (tenantEdited)="edit($event)"
+      (tenantDeleted)="delete($event)">
+    </fileman-tenant-table-layout>
+    <fileman-tenant-tiles-layout *ngSwitchCase="layoutTypeTiles"
+      [viewedTenants]="viewedTenants"
+      [readOnly]="readOnly"
+      (tenantEdited)="edit($event)"
+      (tenantDeleted)="delete($event)">
+    </fileman-tenant-tiles-layout>
+  </div>
 </div>

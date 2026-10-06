@@ -96,6 +96,32 @@ export class LayoutFilemetadataCommons extends LayoutCommons {
       this.buildHtmlTooltipContentRow('Size', ''+file.size)+'</div>'
   }
 
+  /** File type badge text: the tech type (file extension) in capitals, max. 4 letters */
+  getTypeBadge(file: FileMetaData): string {
+    const type = file.techType || Utils.getFileExtension(file.name) || '';
+    return type.toUpperCase().substr(0, 4);
+  }
+
+  /** "Properties · 1.2 KB · 30 Nov 2020" */
+  getMetaLine(file: FileMetaData): string {
+    const parts = [];
+    const groups = this.formatFileGroups(file.fileGroups || []);
+    if (groups) { parts.push(groups); }
+    const size = this.formatSize(file.size);
+    if (size) { parts.push(size); }
+    const date = this.formatShortDate(file.creationDate);
+    if (date) { parts.push(date); }
+    return parts.join(' · ');
+  }
+
+  /** Tile preview ground by first file group (design tokens tint-properties/-templates/-images) */
+  getPreviewTintClass(file: FileMetaData): string {
+    const groups = this.formatFileGroups(file.fileGroups || []).toLowerCase();
+    if (groups.indexOf('template') !== -1) { return 'fm-tile__preview--templates'; }
+    if (groups.indexOf('image') !== -1) { return 'fm-tile__preview--images'; }
+    return '';
+  }
+
   formatFileGroups(fileGroups: FileGroup[]): string {
     let fileGroupString: string = '';
 
